@@ -67,65 +67,69 @@ const LoginPage = () => {
 
             {/* Right Side - Login Form */}
             <div className="login-right">
-                <h2 className="form-title">{isAdmin ? "Admin Login" : "User Login"}</h2>
+    <h2 className="form-title">{isAdmin ? "Admin Login" : "User Login"}</h2>
 
-                {/* Toggle Between User/Admin Login */}
-                <button 
-                    className="toggle-button" 
-                    onClick={() => setIsAdmin(!isAdmin)}
-                >
-                    Switch to {isAdmin ? "User" : "Admin"} Login
-                </button>
+    {/* Toggle Between User/Admin Login */}
+    <button className="switch-button" onClick={() => setIsAdmin(!isAdmin)}>
+        {isAdmin ? "Switch to User Login" : "Switch to Admin Login"}
+    </button>
 
-                <form className="login-form" onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        name="username"
-                        placeholder={isAdmin ? "Admin Username" : "Email or Username"}
-                        className="form-input"
-                        value={formData.username}
-                        onChange={handleChange}
-                    />
-                    {errors.username && <p className="error-text">{errors.username}</p>}
+    <form className="login-form" onSubmit={handleSubmit}>
+        <input
+            type="text"
+            name="username"
+            placeholder={isAdmin ? "Admin Username" : "Email or Username"}
+            className="form-input"
+            value={formData.username}
+            onChange={handleChange}
+        />
+        {errors.username && <p className="error-text">{errors.username}</p>}
 
-                    <div className="password-container">
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            name="password"
-                            placeholder="Password"
-                            className="form-input"
-                            value={formData.password}
-                            onChange={handleChange}
-                        />
-                        <button
-                            type="button"
-                            className="show-password-button"
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
-                            {showPassword ? "Hide" : "Show"}
-                        </button>
-                    </div>
-                    {errors.password && <p className="error-text">{errors.password}</p>}
+        <div className="password-container">
+            <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                className="form-input"
+                value={formData.password}
+                onChange={handleChange}
+            />
+            <button
+                type="button"
+                className="show-password-button"
+                onClick={() => setShowPassword(!showPassword)}
+            >
+                {showPassword ? "Hide" : "Show"}
+            </button>
+        </div>
+        {errors.password && <p className="error-text">{errors.password}</p>}
 
-                    <div className="remember-me">
-                        <input
-                            type="checkbox"
-                            name="rememberMe"
-                            checked={formData.rememberMe}
-                            onChange={handleChange}
-                        />
-                        <label>Remember Me</label>
-                    </div>
+        <div className="remember-me">
+            <input
+                type="checkbox"
+                name="rememberMe"
+                checked={formData.rememberMe}
+                onChange={handleChange}
+            />
+            <label>Remember Me</label>
+        </div>
 
-                    <button type="submit" className="form-button">
-                        {isAdmin ? "Login as Admin" : "Login as User"}
-                    </button>
-                </form>
-                <div className="form-footer">
-                    <a href="/create-account" className="form-link">Create Account</a>
-                    <a href="/forgot-password" className="form-link">Forgot Password</a>
-                </div>
-            </div>
+        <button type="submit" className="form-button">
+            {isAdmin ? "Login as Admin" : "Login as User"}
+        </button>
+    </form>
+
+    {/* Test Navigation Button */}
+    <button onClick={() => navigate("/admin-dashboard")} className="form-button">
+        Go to Admin Dashboard
+    </button>
+
+    <div className="form-footer">
+        <a href="/create-account" className="form-link">Create Account</a>
+        <a href="/forgot-password" className="form-link">Forgot Password</a>
+    </div>
+</div>
+
         </div>
     );
 };

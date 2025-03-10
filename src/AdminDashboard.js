@@ -1,33 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from './Sidebar';
-import './DashboardPage.css';
+import React, { useState } from "react";
+import Sidebar from "../src/Sidebar";
+import "../src/styles/DashboardPage.css";
 
 const AdminDashboard = () => {
-    const [grants, setGrants] = useState([]);
-    const [newGrant, setNewGrant] = useState({ name: '', amount: '', deadline: '', status: '' });
+    const [grants, setGrants] = useState([
+        { id: 1, name: "Cancer Research Fund", amount: 50000, status: "Applied" },
+        { id: 2, name: "Palliative Care Grant", amount: 75000, status: "Granted" }
+    ]);
 
-    useEffect(() => {
-        const storedGrants = JSON.parse(localStorage.getItem("grants")) || [];
-        setGrants(storedGrants);
-    }, []);
-
-    const handleChange = (e) => {
-        setNewGrant({ ...newGrant, [e.target.name]: e.target.value });
+    const handleEdit = (id) => {
+        alert(`Edit grant with ID: ${id}`);
     };
 
-    const addGrant = () => {
-        if (newGrant.name && newGrant.amount && newGrant.deadline && newGrant.status) {
-            const updatedGrants = [...grants, newGrant];
-            setGrants(updatedGrants);
-            localStorage.setItem("grants", JSON.stringify(updatedGrants));
-            setNewGrant({ name: '', amount: '', deadline: '', status: '' }); // Reset form
-        }
-    };
-
-    const deleteGrant = (index) => {
-        const updatedGrants = grants.filter((_, i) => i !== index);
-        setGrants(updatedGrants);
-        localStorage.setItem("grants", JSON.stringify(updatedGrants));
+    const handleDelete = (id) => {
+        setGrants(grants.filter(grant => grant.id !== id));
     };
 
     return (
@@ -35,45 +21,31 @@ const AdminDashboard = () => {
             <Sidebar />
             <div className="dashboard-content">
                 <h2>Admin Dashboard</h2>
+                <p>Admins can add, edit, and manage grants here.</p>
 
-                {/* Add New Grant Form */}
-                <div className="add-grant-form">
-                    <input type="text" name="name" placeholder="Grant Name" value={newGrant.name} onChange={handleChange} />
-                    <input type="text" name="amount" placeholder="Amount" value={newGrant.amount} onChange={handleChange} />
-                    <input type="date" name="deadline" placeholder="Deadline" value={newGrant.deadline} onChange={handleChange} />
-                    <input type="text" name="status" placeholder="Status" value={newGrant.status} onChange={handleChange} />
-                    <button onClick={addGrant}>Add Grant</button>
-                </div>
+                <button className="add-grant-button">➕ Add New Grant</button>
 
-                {/* Grant Table */}
                 <table className="grants-table">
                     <thead>
                         <tr>
                             <th>Grant Name</th>
                             <th>Amount</th>
-                            <th>Deadline</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {grants.length > 0 ? (
-                            grants.map((grant, index) => (
-                                <tr key={index}>
-                                    <td>{grant.name}</td>
-                                    <td>{grant.amount}</td>
-                                    <td>{grant.deadline}</td>
-                                    <td>{grant.status}</td>
-                                    <td>
-                                        <button onClick={() => deleteGrant(index)}>Delete</button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="5">No grants available</td>
+                        {grants.map((grant) => (
+                            <tr key={grant.id}>
+                                <td>{grant.name}</td>
+                                <td>${grant.amount.toLocaleString()}</td>
+                                <td>{grant.status}</td>
+                                <td>
+                                    <button className="edit-button" onClick={() => handleEdit(grant.id)}>✏️ Edit</button>
+                                    <button className="delete-button" onClick={() => handleDelete(grant.id)}>🗑️ Delete</button>
+                                </td>
                             </tr>
-                        )}
+                        ))}
                     </tbody>
                 </table>
             </div>
