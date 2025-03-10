@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./LoginPage.css";
+import '../src/styles/LoginPage.css';
 import { useNavigate } from 'react-router-dom';
-import logo from "./assets/fundhomecarelogo.png";
+import logo from "../src/assets/fundhomecarelogo.png";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -12,6 +12,7 @@ const LoginPage = () => {
 
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false); // Toggle between Admin & User
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -42,9 +43,13 @@ const LoginPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validateForm()) {
-            // Simulate successful login for now
-            alert("Login successful!");
-            navigate("/dashboard");
+            if (isAdmin) {
+                alert("Admin Login successful!");
+                navigate("/admin-dashboard"); // Redirect Admins
+            } else {
+                alert("User Login successful!");
+                navigate("/dashboard"); // Redirect Regular Users
+            }
         }
     };
 
@@ -62,12 +67,21 @@ const LoginPage = () => {
 
             {/* Right Side - Login Form */}
             <div className="login-right">
-                <h2 className="form-title">Sign In</h2>
+                <h2 className="form-title">{isAdmin ? "Admin Login" : "User Login"}</h2>
+
+                {/* Toggle Between User/Admin Login */}
+                <button 
+                    className="toggle-button" 
+                    onClick={() => setIsAdmin(!isAdmin)}
+                >
+                    Switch to {isAdmin ? "User" : "Admin"} Login
+                </button>
+
                 <form className="login-form" onSubmit={handleSubmit}>
                     <input
                         type="text"
                         name="username"
-                        placeholder="Email or Username"
+                        placeholder={isAdmin ? "Admin Username" : "Email or Username"}
                         className="form-input"
                         value={formData.username}
                         onChange={handleChange}
@@ -104,7 +118,7 @@ const LoginPage = () => {
                     </div>
 
                     <button type="submit" className="form-button">
-                        Sign In
+                        {isAdmin ? "Login as Admin" : "Login as User"}
                     </button>
                 </form>
                 <div className="form-footer">

@@ -1,5 +1,5 @@
 import React from 'react';
-import './AuthPages.css';
+import '../src/styles/AuthPages.css';
 import { Link } from 'react-router-dom';
 
 function ForgotPasswordPage() {
