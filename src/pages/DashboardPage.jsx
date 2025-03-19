@@ -10,8 +10,8 @@ const sampleGrants = [
 ];
 
 const DashboardPage = () => {
-
-    
+    const { session } = UserAuth();
+    const navigate = useNavigate();
 
     const [grants, setGrants] = useState(sampleGrants);
     const [search, setSearch] = useState("");

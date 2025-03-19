@@ -17,43 +17,23 @@ const LoginPage = () => {
     const navigate = useNavigate();
 
     const handleSignIn = async (e) => {
-        e.preventDefault();
-        
-        // Validation
-        if (!email.trim()) {
-            setError("Email is required");
-            return;
-        }
-        
-        if (!password) {
-            setError("Password is required");
-        } else if (password.length < 6) {
-            setError("Password must be at least 6 characters long");
-            return;
-        }
+        e.preventDefault()
 
         setLoading(true);
         setError(null);
 
         try {
-            // Use the proper auth function for signing in
-            const result = await signInUser(email, password);
+            const result = await signInUser(email, password)
 
-            if (result?.success) {
-                if (isAdmin) {
-                    navigate('/admin-dashboard');
-                } else {
-                    navigate('/dashboard');
-                }
-            } else {
-                setError("Invalid login credentials");
+            if (result.success){
+                navigate('/dashboard')
             }
         } catch (err) {
-            setError("An error occurred during sign in");
+            setError("an error occurred")
         } finally {
             setLoading(false);
         }
-    };
+    }
 
     return (
         <div className="login-container">
@@ -128,7 +108,7 @@ const LoginPage = () => {
                 </form>
 
                 <div className="form-footer">
-                    <Link to="/create-account" className="form-link">Create Account</Link>
+                    <Link to="/signup" className="form-link">Create Account</Link>
                     <Link to="/forgot-password" className="form-link">Forgot Password</Link>
                 </div>
             </div>

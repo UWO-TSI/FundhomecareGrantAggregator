@@ -9,7 +9,7 @@ const Sidebar = () => {
     const navigate = useNavigate();
     
     const handleLogout = async (e) => {
-        e.prevent.Default();
+        e.preventDefault();
         try{
             await signOut();
             navigate("/");
