@@ -17,16 +17,14 @@ const LoginPage = () => {
     const navigate = useNavigate();
 
     const handleSignIn = async (e) => {
-        e.preventDefault()
-
+        e.preventDefault();
         setLoading(true);
-        setError(null);
 
         try {
             const result = await signInUser(email, password)
 
             if (result.success){
-                navigate('/dashboard')
+                navigate("/dashboard")
             }
         } catch (err) {
             setError("an error occurred")
