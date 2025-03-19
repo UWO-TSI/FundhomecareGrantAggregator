@@ -1,25 +1,30 @@
-import './App.css'
 import supabase from './supabase-client';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import LoginPage from './pages/LoginPage';
+import CreateAccountPage from './pages/CreateAccountPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import DashboardPage from './pages/DashboardPage';
+import AdminDashboard from "./pages/AdminDashboard";
+// import ProtectedAdminRoute from "./ProtectedAdminRoute";
 
 function App() {
-// const[]
-
-  return (
-    <div>
-      {" "}
-      <h1>FUNDHOMECARE CANADA</h1>
-      <div>
-        <input type="text" placeholder='New addition'/>
-        <button>Add Item</button>
-      </div>
-
-
-      <ul>
-
-      </ul>
-    </div>
-  )
-  
+    return (
+      <>
+        <CreateAccountPage />
+        <p>Already have an account? <Link to="/signin"> Sign in! </Link></p>
+      </>
+        // <Router>
+        //     <Routes>
+        //         <Route path="/" element={<LoginPage />} />
+        //         <Route path="/create-account" element={<CreateAccountPage />} />
+        //         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        //         <Route path="/dashboard" element={<DashboardPage />} />
+        //         <Route path="/admin-dashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+        //     </Routes>
+        // </Router>
+    );
 }
 
 export default App;
