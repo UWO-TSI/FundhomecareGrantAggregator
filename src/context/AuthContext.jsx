@@ -59,11 +59,34 @@ export const AuthContextProvider = ({ children }) => {
             console.error("there was an error ", error);
         }
     }
-    
+
+    // Forgot password
+    const sendForgotPasswordEmail = async ( email ) =>{
+        email = email.toLowerCase();
+
+        const {data, error} = await supabase.auth.resetPasswordForEmail({
+            email: email,
+        });
+    }
+
+    useEffect(() => {
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event == "PASSWORD_RECOVERY") {
+                const newPassword = prompt("What would you like your new"
+                        + " password to be?");
+                const { data, error } = await supabase.auth
+                        .updateUser({ password: newPassword })
+            if (data) console.log("Password updated successfully!")
+            if (error) console.log("There was an error updating your "
+                    + "password")
+            }
+        })
+    },[])
+ 
 
 
     return(
-        <AuthContext.Provider value={{ session , signUpNewUser, signOut, signInUser }}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={{ session , signUpNewUser, signOut, signInUser, sendForgotPasswordEmail }}>{children}</AuthContext.Provider>
     )
 };
 
