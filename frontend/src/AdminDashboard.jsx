@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import "../src/styles/DashboardPage.css";
 import GrantDetailsModal from './components/GrantDetailsModal';
 
+
 const AdminDashboard = () => {
     const [grants, setGrants] = useState([
         { id: 1, name: "Cancer Research Fund", amount: 50000, status: "Applied" },
@@ -16,6 +17,10 @@ const AdminDashboard = () => {
     const handleDelete = (id) => {
         setGrants(grants.filter(grant => grant.id !== id));
     };
+
+    const [showModal, setShowModal] = useState(false);
+    const [selectedGrant, setSelectedGrant] = useState(null);
+
 
     return (
         <div className="dashboard-container">
@@ -42,7 +47,10 @@ const AdminDashboard = () => {
                                 <td>${grant.amount.toLocaleString()}</td>
                                 <td>{grant.status}</td>
                                 <td>
-                                    <button className="edit-button" onClick={() => handleEdit(grant.id)}>✏️ Edit</button>
+                                    <button className="edit-button" onClick={() => {
+                                        setSelectedGrant(grant);
+                                        setShowModal(true);
+                                    }}>✏️ View</button>
                                     <button className="delete-button" onClick={() => handleDelete(grant.id)}>🗑️ Delete</button>
                                 </td>
                             </tr>
@@ -50,6 +58,12 @@ const AdminDashboard = () => {
                     </tbody>
                 </table>
             </div>
+            {showModal && (
+                <GrantDetailsModal
+                  grant={selectedGrant}
+                  onClose={() => setShowModal(false)}
+                />  
+            )}
         </div>
     );
 };
