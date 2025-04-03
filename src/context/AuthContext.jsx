@@ -32,7 +32,7 @@ export const AuthContextProvider = ({ children }) => {
 
             if (error){
                 console.error("sign in error ocurred: ", error);
-                return {succes: false, error: error.message}
+                return {success: false, error: error.message}
             }
             console.log("sign-in success: ", data);
             return { success: true, data };
@@ -51,7 +51,6 @@ export const AuthContextProvider = ({ children }) => {
         })
     },[])
 
-
     // Signout
     const signOut = () => {
         const {error} = supabase.auth.signOut();
@@ -62,31 +61,45 @@ export const AuthContextProvider = ({ children }) => {
 
     // Forgot password
     const sendForgotPasswordEmail = async ( email ) =>{
-        email = email.toLowerCase();
+        try {
+            email = email.toLowerCase();
 
-        const {data, error} = await supabase.auth.resetPasswordForEmail({
-            email: email,
-        });
+            const {data, error} = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: 'http://localhost:5173/update-password',
+            });
+
+            if (error){
+                console.error("forgot password error ocurred: ", error);
+                return {success: false, error: error.message}
+            }
+            console.log("forgot password success: ", data);
+            return { success: true };
+        } catch(error) {
+            console.error("an error occurred: ", error)
+        }
+
     }
 
-    useEffect(() => {
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event == "PASSWORD_RECOVERY") {
-                const newPassword = prompt("What would you like your new"
-                        + " password to be?");
-                const { data, error } = await supabase.auth
-                        .updateUser({ password: newPassword })
-            if (data) console.log("Password updated successfully!")
-            if (error) console.log("There was an error updating your "
-                    + "password")
-            }
-        })
-    },[])
- 
+    // Update password
+    const updatePassword = async ( newPassword ) =>{
+        try {
+            const {data, error} = await supabase.auth.updateUser({
+                password: newPassword,
+            });
 
+            if (error) {
+                console.error("Error updating password: ", error);
+                return {success: false, error: error.message}
+            }
+            console.log("Update password success: ", data);
+            return { success: true };
+        } catch(error) {
+            console.error("An error occurred: ", error)
+        }
+    }
 
     return(
-        <AuthContext.Provider value={{ session , signUpNewUser, signOut, signInUser, sendForgotPasswordEmail }}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={{ session , signUpNewUser, signOut, signInUser, sendForgotPasswordEmail, updatePassword }}>{children}</AuthContext.Provider>
     )
 };
 
