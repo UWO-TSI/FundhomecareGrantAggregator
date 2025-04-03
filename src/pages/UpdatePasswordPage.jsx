@@ -9,7 +9,7 @@ function UpdatePasswordPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { session, updatePassword } = UserAuth();
+    const { session, otpSignIn, updatePassword } = UserAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [token, setToken] = useState(null);
@@ -22,18 +22,13 @@ function UpdatePasswordPage() {
         } else {
             setError("Invalid or missing password reset token.");
         }
+        const resetEmail = searchParams.get('email');
     }, [searchParams]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
-
-        if (!token) {
-            setError("Invalid or missing password reset token.");
-            setLoading(false);
-            return;
-        }
 
         if (newPassword !== confirmPassword) {
             setError('Passwords do not match.');
@@ -42,15 +37,24 @@ function UpdatePasswordPage() {
         }
 
         try {
-            const result = await updatePassword(newPassword, token);
-            console.log("Update password result: ", result); // Debug
+            const verify = await otpSignIn(token);
+            console.log("OTP Sign In result: ", verify); // Debug
 
-            if (result && result.success) {
-                setError('Password updated successfully! You will be redirected to the login page.');
-                setTimeout(() => {
-                    navigate('/signin');
-                }, 2000);
+            if (verify && verify.success) {
+                setError('User authenticated!');
+                
+                const result = await updatePassword(newPassword);
+                console.log("Update password result: ", result); // Debug
+
+                if (result && result.success) {
+                    setError('Password updated successfully! You will be redirected to the login page.');
+                    setTimeout(() => {
+                        navigate('/signin');
+                    }, 2000);
+                }
+
             }
+
         } catch (err) {
             console.error('An unexpected error occurred:', err);
             setError('An unexpected error occurred. Please try again later.');

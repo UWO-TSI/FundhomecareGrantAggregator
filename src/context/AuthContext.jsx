@@ -80,13 +80,31 @@ export const AuthContextProvider = ({ children }) => {
 
     }
 
+    // OTP Sign In
+    const otpSignIn = async (givenToken) =>{
+        try {
+            const {data, error} = await supabase.auth.verifyOtp({
+                token_hash: givenToken,
+                type: 'email',
+            });
+
+            if (error) {
+                console.error("Error verifying OTP: ", error);
+                return {success: false, error: error.message}
+            }
+            console.log("OTP success: ", data);
+            return { success: true };
+        } catch(error) {
+            console.error("An error occurred: ", error)
+        }
+    }
+
+
     // Update password
-    const updatePassword = async ( newPassword, token ) =>{
+    const updatePassword = async ( newPassword, token, userEmail ) =>{
         try {
             const {data, error} = await supabase.auth.updateUser({
                 password: newPassword,
-                token: token,
-                type: 'recovery',
             });
 
             if (error) {
@@ -101,7 +119,7 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     return(
-        <AuthContext.Provider value={{ session , signUpNewUser, signOut, signInUser, sendForgotPasswordEmail, updatePassword }}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={{ session , signUpNewUser, signOut, signInUser, sendForgotPasswordEmail, otpSignIn, updatePassword }}>{children}</AuthContext.Provider>
     )
 };
 
