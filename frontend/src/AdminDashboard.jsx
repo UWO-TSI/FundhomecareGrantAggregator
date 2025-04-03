@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import "../src/styles/DashboardPage.css";
+import GrantDetailsModal from './components/GrantDetailsModal';
 
 const AdminDashboard = () => {
     const [grants, setGrants] = useState([
