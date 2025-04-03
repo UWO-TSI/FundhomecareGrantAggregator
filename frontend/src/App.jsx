@@ -6,6 +6,7 @@ import ForgotPasswordPage from './ForgotPasswordPage';
 import DashboardPage from './DashboardPage';
 import AdminDashboard from "./AdminDashboard";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
+import GrantDetailsModal from './components/GrantDetailsModal';
 
 function App() {
     return (
