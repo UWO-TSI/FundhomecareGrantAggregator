@@ -81,10 +81,12 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     // Update password
-    const updatePassword = async ( newPassword ) =>{
+    const updatePassword = async ( newPassword, token ) =>{
         try {
             const {data, error} = await supabase.auth.updateUser({
                 password: newPassword,
+                token: token,
+                type: 'recovery',
             });
 
             if (error) {

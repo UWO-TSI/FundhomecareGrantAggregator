@@ -9,10 +9,11 @@ function UpdatePasswordPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { updatePassword } = UserAuth();
+    const { session, updatePassword } = UserAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [token, setToken] = useState(null);
+    console.log(session);
 
     useEffect(() => {
         const resetToken = searchParams.get('token');
@@ -41,7 +42,7 @@ function UpdatePasswordPage() {
         }
 
         try {
-            const result = await updatePassword(newPassword);
+            const result = await updatePassword(newPassword, token);
             console.log("Update password result: ", result); // Debug
 
             if (result && result.success) {
