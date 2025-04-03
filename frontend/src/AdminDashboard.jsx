@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import "../src/styles/DashboardPage.css";
-import GrantDetailsModal from './components/GrantDetailsModal';
+import GrantDetailsModal from './GrantDetailsModal';
 
 
 const AdminDashboard = () => {

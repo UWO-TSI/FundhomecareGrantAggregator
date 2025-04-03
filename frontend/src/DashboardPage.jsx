@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import "../src/styles/DashboardPage.css";
-import GrantDetailsModal from './components/GrantDetailsModal';
+import GrantDetailsModal from './GrantDetailsModal';
 
 const sampleGrants = [
   { name: "Cancer Research Fund", type: "Donation", amount: 50000, date: "2024-01-15", assignee: "Alice", status: "In Process" },
@@ -9,14 +9,22 @@ const sampleGrants = [
 ];
 
 const DashboardPage = () => {
-  const [grants, setGrants] = useState(sampleGrants);
+  const [grants] = useState(sampleGrants);
+  const [selectedGrant, setSelectedGrant] = useState(null);
   const [search, setSearch] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterAssignee, setFilterAssignee] = useState("");
 
-  const [showModal, setShowModal] = useState(false);
-  const [selectedGrant, setSelectedGrant] = useState(null);
+ // Open modal with clicked grant details
+ const openGrantDetails = (grant) => {
+  setSelectedGrant(grant);
+};
+
+// Close modal
+const closeGrantDetails = () => {
+  setSelectedGrant(null);
+}
 
   // Calculate total grant amounts
   const totalAmount = grants.reduce((sum, grant) => sum + grant.amount, 0);
@@ -68,50 +76,37 @@ const DashboardPage = () => {
 
         {/* Grants Table */}
         <table className="grants-table">
-          <thead>
-            <tr>
-              <th>Grant Name</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Date</th>
-              <th>Assignee</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredGrants.map((grant, index) => (
-              <tr key={index}>
-                <td>{grant.name}</td>
-                <td>{grant.type}</td>
-                <td>${grant.amount.toLocaleString()}</td>
-                <td>{grant.date}</td>
-                <td>{grant.assignee}</td>
-                <td>{grant.status}</td>
-                <td>
-                  <button
-                    className="view-button"
-                    onClick={() => {
-                      setSelectedGrant(grant);
-                      setShowModal(true);
-                    }}
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    <thead>
+                        <tr>
+                            <th>Grant Name</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Assignee</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {grants.map((grant, index) => (
+                            <tr key={index}>
+                                <td>
+                                    <button className="grant-title" onClick={() => openGrantDetails(grant)}>
+                                        {grant.name}
+                                    </button>
+                                </td>
+                                <td>{grant.type}</td>
+                                <td>${grant.amount.toLocaleString()}</td>
+                                <td>{grant.date}</td>
+                                <td>{grant.assignee}</td>
+                                <td>{grant.status}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
       </div>
 
-      {/* Grant Details Modal */}
-      {showModal && (
-        <GrantDetailsModal
-          grant={selectedGrant}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+      {/* Render the Modal */}
+      {selectedGrant && <GrantDetailsModal grant={selectedGrant} onClose={closeGrantDetails} />}
     </div>
   );
 };
