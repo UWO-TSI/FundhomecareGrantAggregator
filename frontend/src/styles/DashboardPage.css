@@ -139,3 +139,13 @@
 .logout-button:hover {
     background: #d63447;
 }
+
+.sidebar-menu li a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .sidebar-menu li a:hover {
+    text-decoration: underline;
+  }
+  

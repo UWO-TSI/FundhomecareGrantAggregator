@@ -6,7 +6,8 @@ import ForgotPasswordPage from './ForgotPasswordPage';
 import DashboardPage from './DashboardPage';
 import AdminDashboard from "./AdminDashboard";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
-import GrantDetailsModal from './GrantDetailsModal';
+import SettingsPage from './Settings';
+
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/admin-dashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+                <Route path="/settings" element={<SettingsPage />} />
             </Routes>
         </Router>
     );
