@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import "../src/styles/DashboardPage.css";
+import GrantDetailsModal from './components/GrantDetailsModal';
 
 const sampleGrants = [
     { name: "Cancer Research Fund", type: "Donation", amount: 50000, date: "2024-01-15", assignee: "Alice", status: "In Process" },
