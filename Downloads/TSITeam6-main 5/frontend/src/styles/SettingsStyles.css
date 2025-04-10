@@ -1,0 +1,17 @@
+.settings-container {
+    padding: 2rem;
+  }
+  
+  .settings-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  
+  .settings-table th,
+  .settings-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
