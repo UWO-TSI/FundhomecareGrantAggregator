@@ -1,3 +1,7 @@
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable"; 
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import "../src/styles/DashboardPage.css";
@@ -36,6 +40,89 @@ const closeGrantDetails = () => {
     (filterAssignee ? grant.assignee.toLowerCase().includes(filterAssignee.toLowerCase()) : true)
   );
 
+  const handleExport = (type) => {
+    if (type === "pdf") {
+      const doc = new jsPDF();
+  
+      // Load image
+      const img = new Image();
+      img.src = "/fundhomecarelogo.png"; 
+  
+      img.onload = function () {
+        // Add the logo to the PDF
+        doc.addImage(img, "PNG", 14, 10, 40, 15); // (image, format, x, y, width, height)
+  
+        // Title
+        doc.setFontSize(18);
+        doc.setTextColor(80, 0, 140);
+        doc.text("Grants Report", 60, 20);
+  
+        // Timestamp
+        const now = new Date();
+        const formattedDate = now.toLocaleString();
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Generated: ${formattedDate}`, 14, 30);
+  
+        // Table
+        autoTable(doc, {
+          startY: 35,
+          head: [["Grant Name", "Type", "Amount", "Date", "Assignee", "Status"]],
+          body: filteredGrants.map((g) => [
+            g.name,
+            g.type,
+            `$${g.amount.toLocaleString()}`,
+            g.date,
+            g.assignee,
+            g.status,
+          ]),
+          theme: "grid",
+          styles: {
+            font: "helvetica",
+            fontSize: 10,
+            textColor: "#333333",
+          },
+          headStyles: {
+            fillColor: [138, 43, 226],
+            textColor: "#ffffff",
+            fontStyle: "bold",
+          },
+          alternateRowStyles: {
+            fillColor: [245, 240, 255],
+          },
+        });
+  
+        // Footer
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text("Approved by: _______________________", 14, doc.lastAutoTable.finalY + 20);
+  
+        doc.save("grants-report.pdf");
+      };
+    }
+  
+    if (type === "excel") {
+      const worksheetData = filteredGrants.map((g) => ({
+        Name: g.name,
+        Type: g.type,
+        Amount: g.amount,
+        Date: g.date,
+        Assignee: g.assignee,
+        Status: g.status,
+      }));
+  
+      const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Grants");
+  
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+      saveAs(blob, "grants-report.xlsx");
+    }
+  };
+  
+  
+
   return (
     <div className="dashboard-container">
       <Sidebar />
@@ -73,6 +160,10 @@ const closeGrantDetails = () => {
             className="filter-input"
           />
         </div>
+        <div className="export-buttons"> 
+          <button onClick={() => handleExport("pdf")} className="export-button pdf">📄 PRINT / PDF</button>
+          <button onClick={() => handleExport("excel")} className="export-button excel">⬇️ EXPORT</button>
+        </div>
 
         {/* Grants Table */}
         <table className="grants-table">
@@ -87,21 +178,22 @@ const closeGrantDetails = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {grants.map((grant, index) => (
-                            <tr key={index}>
-                                <td>
-                                    <button className="grant-title" onClick={() => openGrantDetails(grant)}>
-                                        {grant.name}
-                                    </button>
-                                </td>
-                                <td>{grant.type}</td>
-                                <td>${grant.amount.toLocaleString()}</td>
-                                <td>{grant.date}</td>
-                                <td>{grant.assignee}</td>
-                                <td>{grant.status}</td>
-                            </tr>
-                        ))}
+                      {filteredGrants.map((grant, index) => (
+                        <tr key={index}>
+                          <td>
+                            <button className="grant-title" onClick={() => openGrantDetails(grant)}>
+                              {grant.name}
+                            </button>
+                          </td>
+                          <td>{grant.type}</td>
+                          <td>${grant.amount.toLocaleString()}</td>
+                          <td>{grant.date}</td>
+                          <td>{grant.assignee}</td>
+                          <td>{grant.status}</td>
+                        </tr>
+                      ))}
                     </tbody>
+
                 </table>
       </div>
 

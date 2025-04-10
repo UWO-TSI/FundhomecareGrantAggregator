@@ -1,151 +1,201 @@
-/* Dashboard Layout */
+/* ============ Layout ============ */
 .dashboard-container {
     display: flex;
     height: 100vh;
-    background: #f8f9fa;
-}
-
-/* Sidebar */
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    width: 250px;
-    height: 100vh;
-    background: linear-gradient(to bottom, #6a0dad, #8a2be2);
-    padding: 20px;
+    background: linear-gradient(135deg, #e0b3ff, #d1a1ff, #c18fff);
+  }
+  
+  
+  /* ============ Sidebar ============ */
+  .sidebar {
+    background: linear-gradient(180deg, #5E1F77 0%, #8B6DBD 100%);
     color: white;
-    box-sizing: border-box;
-}
-
-.sidebar-logo {
-    width: 120px;
-    height: auto;
-    margin-bottom: 20px;
-}
-
-.sidebar-menu {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 50px;
-    flex-grow: 1;
+    padding: 20px;
+    width: 220px; /* Slightly narrower */
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-
-.sidebar-menu li {
-    padding: 10px;
+    justify-content: space-between;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar-logo-container {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 30px;
+  }
+  
+  .sidebar-logo {
+    max-width: 200px;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6)); /* brighter glow */
+    margin-bottom: 30px;
+  }
+  
+  /* Sidebar Menu */
+  .sidebar-menu {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    text-align: left; /* ✅ Left-align the text */
+  }
+  
+  .sidebar-menu li {
+    margin-bottom: 20px;
+    text-align: left; /* ✅ Make sure list items also align left */
+  }
+  
+  .sidebar-menu li a {
+    justify-content: flex-start; /* ✅ Push icon + text to the left */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    color: white;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+  }
+  
+  
+  .sidebar-menu li a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    text-decoration: underline;
+  }
+  
+  /* Logout Button */
+  .logout-button {
+    margin-top: auto;
+    background: #ff4b5c;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    font-size: 16px;
     cursor: pointer;
-}
-
-.sidebar-menu li:hover {
-    background: rgba(255, 255, 255, 0.2);
     border-radius: 5px;
-}
-
-/* Content Styling */
-.dashboard-content {
+    width: 100%;
+    position: sticky;
+    bottom: 20px;
+    transition: background 0.2s ease;
+  }
+  
+  .logout-button:hover {
+    background: #8B0000; /* 🔥 darker red */
+  }
+  
+  /* ============ Main Content ============ */
+  .dashboard-content {
     flex: 1;
     padding: 20px;
     background: white;
+    margin: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(138, 43, 226, 0.1); /* Add violet glow */
     overflow-y: auto;
-}
-
-/* Title */
-.dashboard-title {
+  }
+  
+  
+  
+  .dashboard-title {
     font-size: 22px;
     font-weight: bold;
     margin-bottom: 15px;
-}
-
-/* Summary Box - Display Inline */
-.summary-box {
-    background: #8a2be2;  /* Purple background */
+  }
+  
+  /* ============ Summary Box ============ */
+  .summary-box {
+    background: #8a2be2;
     color: white;
     padding: 15px;
     border-radius: 5px;
     font-size: 16px;
     margin-bottom: 20px;
-    display: flex;  /* Make elements align in a row */
-    justify-content: space-between; /* Space out content */
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    width: 100%;
-    max-width: 500px; /* Optional: Adjust width */
-}
-
-
-/* Filters */
-.filter-container {
+    max-width: 500px;
+  }
+  
+  /* ============ Filters ============ */
+  .filter-container {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
     flex-wrap: wrap;
-}
-
-.filter-input {
+  }
+  
+  .filter-input {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 14px;
-}
-
-/* Table */
-.grants-table {
+  }
+  
+  /* ============ Table Styling ============ */
+  .grants-table {
     width: 100%;
     border-collapse: collapse;
     background: white;
     border-radius: 5px;
     overflow: hidden;
-}
-
-.grants-table th {
-    background: #8a2be2;
+  }
+  
+  .grants-table th {
+    background: #7B2CBF;
     color: white;
     padding: 10px;
     text-align: left;
-}
-
-.grants-table td {
+    font-weight: bold;
+  }
+  
+  .grants-table td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
-}
-
-.grants-table tr:hover {
+  }
+  
+  .grants-table tr:hover {
     background-color: #f1f1f1;
-}
-
-/* No Results Message */
-.no-results {
+  }
+  
+  /* ============ No Results ============ */
+  .no-results {
     text-align: center;
     font-weight: bold;
     color: #666;
     padding: 15px;
-}
-
-/* Logout Button */
-.logout-button {
-    margin-top: auto;
-    background: #ff4b5c;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    text-align: center;
-    width: 100%;
-}
-
-.logout-button:hover {
-    background: #d63447;
-}
-
-.sidebar-menu li a {
-    color: white;
-    text-decoration: none;
   }
   
-  .sidebar-menu li a:hover {
-    text-decoration: underline;
+  /* ============ Export Buttons ============ */
+  .export-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+  }
+  
+  .export-button {
+    background-color: #7B2CBF;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .export-button.pdf {
+    background-color: #8a2be2;
+  }
+  
+  .export-button.excel {
+    background-color: #8a2be2;
+  }
+  
+  /* Hover effects for both buttons */
+  .export-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+    filter: brightness(1.05);
   }
   
