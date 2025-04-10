@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import "../src/styles/DashboardPage.css";
 import GrantDetailsModal from './GrantDetailsModal';
 import AddGrantModal from './AddGrantModal'; // ✅ new import
+import GrantStatusChart from '../src/components/GrantStatusChart';
 
 const AdminDashboard = () => {
     const [grants, setGrants] = useState([
@@ -38,6 +39,8 @@ const AdminDashboard = () => {
             <div className="dashboard-content">
                 <h2>Admin Dashboard</h2>
                 <p>Admins can add, edit, and manage grants here.</p>
+
+                <GrantStatusChart grants={grants} />
 
                 {/* ✅ Add New Grant Button */}
                 <button className="add-grant-button" onClick={() => setIsAddModalOpen(true)}>

@@ -2,10 +2,11 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable"; 
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import "../src/styles/DashboardPage.css";
 import GrantDetailsModal from './GrantDetailsModal';
+import GrantStatusChart from '../src/components/GrantStatusChart';
 
 const sampleGrants = [
   { name: "Cancer Research Fund", type: "Donation", amount: 50000, date: "2024-01-15", assignee: "Alice", status: "In Process" },
@@ -13,12 +14,16 @@ const sampleGrants = [
 ];
 
 const DashboardPage = () => {
-  const [grants] = useState(sampleGrants);
+  const [grants, setGrants] = useState([]);
   const [selectedGrant, setSelectedGrant] = useState(null);
   const [search, setSearch] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterAssignee, setFilterAssignee] = useState("");
+
+  useEffect(() => {
+    setGrants(sampleGrants);
+  }, []);
 
  // Open modal with clicked grant details
  const openGrantDetails = (grant) => {
@@ -130,6 +135,8 @@ const closeGrantDetails = () => {
         <h2>Grants Dashboard</h2>
 
         <p><strong>Total Grant Amount:</strong> ${totalAmount.toLocaleString()}</p>
+
+        <GrantStatusChart grants={filteredGrants} />  {/* ✅ Insert chart */}
 
         {/* Search & Filters */}
         <div className="filter-container">

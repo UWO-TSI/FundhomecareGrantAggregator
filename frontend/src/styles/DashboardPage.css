@@ -2,6 +2,7 @@
 .dashboard-container {
     display: flex;
     height: 100vh;
+    overflow: hidden;
     background: linear-gradient(135deg, #e0b3ff, #d1a1ff, #c18fff);
   }
   
@@ -89,11 +90,13 @@
     flex: 1;
     padding: 20px;
     background: white;
-    margin: 20px;
     border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(138, 43, 226, 0.1); /* Add violet glow */
+    box-shadow: 0 10px 20px rgba(138, 43, 226, 0.1);
     overflow-y: auto;
+    max-height: 100vh;
+    margin: 0;
   }
+  
   
   
   

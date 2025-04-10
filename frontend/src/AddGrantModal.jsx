@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/GrantDetailsModal.css";
+import "../src/styles/GrantDetailsModal.css";
 
 const AddGrantModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
