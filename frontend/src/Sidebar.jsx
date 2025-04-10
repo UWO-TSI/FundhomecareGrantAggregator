@@ -19,9 +19,6 @@ const Sidebar = () => {
                     <Link to="/dashboard">📄 Grants</Link>
                 </li>
                 <li>
-                    <Link to="/analytics">⭐ Statistics</Link>
-                </li>
-                <li>
                     <Link to="/settings">⚙️ Settings</Link>
                 </li>
             </ul>
