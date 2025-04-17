@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../src/styles/AuthPages.css';
 import { Link } from 'react-router-dom';
-import { supabase } from './supabase-client'; // update this path as needed
+import  supabase  from './supabase-client'; // update this path as needed
 
 function ForgotPasswordPage() {
   const [email, setEmail] = useState("");

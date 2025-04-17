@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable"; 
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import { saveAs } from 'file-saver';
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import "../src/styles/DashboardPage.css";
