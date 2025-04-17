@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar"; // Adjust the import path based on your file structure
-import "../styles/DashboardPage.css"; // Adjust the import path based on your file structure
+import Sidebar from "../components/Sidebar";
+import "../styles/DashboardPage.css";
+import GrantDetailsModal from './GrantDetailsModal';
+import AddGrantModal from './AddGrantModal'; // ✅ new import
+import GrantStatusChart from '../components/GrantStatusChart';
 
 const AdminDashboard = () => {
     const [grants, setGrants] = useState([
@@ -16,13 +19,34 @@ const AdminDashboard = () => {
         setGrants(grants.filter(grant => grant.id !== id));
     };
 
+    const [showModal, setShowModal] = useState(false);
+    const [selectedGrant, setSelectedGrant] = useState(null);
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false); // ✅ new modal state
+
+    const handleAddGrant = (newGrant) => {
+        const newGrantWithId = {
+            ...newGrant,
+            id: grants.length + 1,
+            amount: parseFloat(newGrant.amount)
+        };
+        setGrants(prev => [...prev, newGrantWithId]);
+    };
+
     return (
         <div className="dashboard-container">
             <Sidebar />
             <div className="dashboard-content">
                 <h2>Admin Dashboard</h2>
                 <p>Admins can add, edit, and manage grants here.</p>
-                <button className="add-grant-button">➕ Add New Grant</button>
+
+                <GrantStatusChart grants={grants} />
+
+                {/* ✅ Add New Grant Button */}
+                <button className="add-grant-button" onClick={() => setIsAddModalOpen(true)}>
+                    ➕ Add New Grant
+                </button>
+
                 <table className="grants-table">
                     <thead>
                         <tr>
@@ -39,14 +63,44 @@ const AdminDashboard = () => {
                                 <td>${grant.amount.toLocaleString()}</td>
                                 <td>{grant.status}</td>
                                 <td>
-                                    <button className="edit-button" onClick={() => handleEdit(grant.id)}>✏️ Edit</button>
-                                    <button className="delete-button" onClick={() => handleDelete(grant.id)}>🗑️ Delete</button>
+                                    <button
+                                        className="edit-button"
+                                        onClick={() => {
+                                            setSelectedGrant(grant);
+                                            setShowModal(true);
+                                        }}
+                                    >
+                                        ✏️ View
+                                    </button>
+                                    <button
+                                        className="delete-button"
+                                        onClick={() => handleDelete(grant.id)}
+                                    >
+                                        🗑️ Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            {/* ✅ View Grant Modal */}
+            {showModal && (
+                <GrantDetailsModal
+                    grant={selectedGrant}
+                    onClose={() => setShowModal(false)}
+                />
+            )}
+
+            {/* ✅ Add Grant Modal */}
+            {isAddModalOpen && (
+                <AddGrantModal
+                    isOpen={isAddModalOpen}
+                    onClose={() => setIsAddModalOpen(false)}
+                    onSubmit={handleAddGrant}
+                />
+            )}
         </div>
     );
 };

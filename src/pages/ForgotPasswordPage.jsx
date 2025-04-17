@@ -42,11 +42,13 @@ function ForgotPasswordPage() {
                     type="email" 
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email" 
-                    className="auth-input" 
+                    className="auth-input"
+		            required 
                 />
-                <button type="submit" disabled={loading} className="auth-button">Send Reset Link</button>
+                <button type="submit" disabled={loading} className="auth-button">
+                    {loading ? "Sending..." : "Send Reset Link"}
+                </button>
                 {error && <p className="error-message">{error}</p>}
-
             </form>
             <p className="auth-link">
                 Remember your password? <Link to="/">Sign In</Link>

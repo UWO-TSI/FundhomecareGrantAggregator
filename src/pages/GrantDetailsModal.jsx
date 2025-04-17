@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../src/styles/GrantDetailsModal.css";
+import "../styles/GrantDetailsModal.css";
 
 const GrantDetailsModal = ({ grant, onClose }) => {
     const [isFullScreen, setIsFullScreen] = useState(false); // ✅ Fix: Add this state
