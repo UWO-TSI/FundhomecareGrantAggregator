@@ -87,8 +87,7 @@ const LoginPage = () => {
                             {showPassword ? "Hide" : "Show"}
                         </button>
                     </div>
-                    {errors.password && <p className="error-text">{errors.password}</p>}
-
+                    
                     <div className="remember-me">
                         <input
                             type="checkbox"
