@@ -38,8 +38,10 @@ const LoginPage = () => {
             {/* Left Side - Branding & Welcome Message */}
             <div className="login-left">
                 <img src={logo} alt="Logo" className="login-logo" />
-                <h1 className="brand-title">FUND HOMECARE Canada</h1>
-                <h2 className="welcome-title">Welcome to <span className="highlight">GrantFinder</span></h2>
+                <h2 className="welcome-title" data-text="Welcome to GrantFinder">
+                    Welcome to <span className="highlight">GrantFinder</span>
+                </h2>
+
                 <p className="welcome-text">
                     Easily find and apply for grants in one place. Sign in to explore available grants and manage your applications.
                 </p>
@@ -85,6 +87,7 @@ const LoginPage = () => {
                             {showPassword ? "Hide" : "Show"}
                         </button>
                     </div>
+                    {errors.password && <p className="error-text">{errors.password}</p>}
 
                     <div className="remember-me">
                         <input
