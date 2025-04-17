@@ -12,18 +12,10 @@ import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
     return (
+      /* Begin application on login page. */
       <>
         <LoginPage />
       </>
-        // <Router>
-        //     <Routes>
-        //         <Route path="/" element={<LoginPage />} />
-        //         <Route path="/create-account" element={<CreateAccountPage />} />
-        //         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        //         <Route path="/dashboard" element={<DashboardPage />} />
-        //         <Route path="/admin-dashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
-        //     </Routes>
-        // </Router>
     );
 }
 
