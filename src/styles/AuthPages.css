@@ -37,7 +37,7 @@
 
 .auth-button {
     padding: 0.75rem;
-    background-color: #0077b6;
+    background-color: #7B2CBF;
     color: white;
     border: none;
     border-radius: 5px;
@@ -47,17 +47,17 @@
 }
 
 .auth-button:hover {
-    background-color: #005f8a;
+    background-color: #7B2CBF;
 }
 
 .auth-link {
     margin-top: 1rem;
     font-size: 14px;
-    color: #0077b6;
+    color: #7B2CBF;
 }
 
 .auth-link a {
-    color: #0077b6;
+    color: #7B2CBF;
     text-decoration: none;
     font-weight: bold;
 }
