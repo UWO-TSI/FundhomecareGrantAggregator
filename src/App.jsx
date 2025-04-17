@@ -13,8 +13,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 function App() {
     return (
       <>
-        <CreateAccountPage />
-        <p>Already have an account? <Link to="/signin"> Sign in! </Link></p>
+        <LoginPage />
       </>
         // <Router>
         //     <Routes>
