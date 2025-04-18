@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
-import '../styles/AuthPages.css';
+import '../styles/UpdatePasswordPage.css';
+
 
 function UpdatePasswordPage() {
     const [newPassword, setNewPassword] = useState('');
@@ -64,7 +65,7 @@ function UpdatePasswordPage() {
     };
 
     return (
-        <div className="auth-page-container">
+        <div className="update-password-container">
             <h2 className="auth-title">Update Your Password</h2>
             <p className="auth-description">Enter your new password.</p>
             {error && <p className={error.includes('successfully') ? 'success-message' : 'error-message'}>{error}</p>}

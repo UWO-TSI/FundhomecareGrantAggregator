@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../styles/AuthPages.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
+import '../styles/ForgotPasswordPage.css';
 
 function ForgotPasswordPage() {
 
