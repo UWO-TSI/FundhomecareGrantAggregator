@@ -1,10 +1,13 @@
 /* ============ Layout ============ */
 .dashboard-container {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-    background: linear-gradient(135deg, #e0b3ff, #d1a1ff, #c18fff);
-  }
+  display: flex;
+  min-height: 100vh;         /* allows growing content */
+  width: 100vw;
+  overflow-x: hidden;        /* fix side scrollbar */
+  background: linear-gradient(135deg, #e0b3ff, #d1a1ff, #c18fff);
+}
+
+
   
   /* Ensure all text content has consistent styling */
   .dashboard-content h1, 
@@ -111,10 +114,10 @@
     background: white;
     border-radius: 12px;
     box-shadow: 0 10px 20px rgba(138, 43, 226, 0.1);
-    overflow-y: auto;
-    max-height: 100vh;
+    overflow-x: hidden; /* ✅ prevents side scroll */
     margin: 0;
   }
+  
   
   /* Dashboard Headings */
   .dashboard-content h2, 
@@ -245,5 +248,9 @@
     padding: 0;
     text-decoration: underline;
     font-weight: 500;
+  }
+
+  .table-wrapper {
+    overflow-x: auto; /* Allows horizontal scrolling on smaller screens */
   }
   
