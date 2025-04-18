@@ -1,3 +1,21 @@
+/* Reset default browser spacing and fix overflow */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  font-family: sans-serif;
+  background-color: #f5f5f5;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+
 .App {
   text-align: center;
 }
@@ -33,9 +51,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  gap: 1rem;
+  min-height: 100vh; /* prevents overflow when form is tall */
+  width: 100%;
+  padding: 2rem;
 }
+
 
 form {
   display: flex;
