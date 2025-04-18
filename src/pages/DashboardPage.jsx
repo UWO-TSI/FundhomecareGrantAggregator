@@ -9,6 +9,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import GrantDetailsModal from './GrantDetailsModal';
 import GrantStatusChart from '../components/GrantStatusChart';
+import supabase from '../supabase-client';
 
 const sampleGrants = [
     { name: "Cancer Research Fund", type: "Donation", amount: 50000, date: "2024-01-15", assignee: "Alice", status: "In Process" },
@@ -17,34 +18,89 @@ const sampleGrants = [
   
   const DashboardPage = () => {
     const [grants, setGrants] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [selectedGrant, setSelectedGrant] = useState(null);
     const [search, setSearch] = useState("");
     const [filterDate, setFilterDate] = useState("");
     const [filterType, setFilterType] = useState("");
     const [filterAssignee, setFilterAssignee] = useState("");
   
+    // Fetch grants from Supabase
     useEffect(() => {
-      setGrants(sampleGrants);
+      const fetchGrants = async () => {
+        try {
+          setLoading(true);
+          
+          // Make sure to log any errors in the console
+          console.log("Fetching grants from Supabase...");
+          
+          const { data, error } = await supabase
+            .from('Grant')
+            .select('*');
+          
+          if (error) {
+            console.error("Supabase error:", error);
+            throw error;
+          }
+          
+          console.log("Grants fetched:", data);
+          
+          // Transform data for dashboard display
+          const formattedGrants = data.map(grant => ({
+            name: grant.title || "Untitled Grant",
+            type: grant.funding_agency || "Unknown",
+            amount: grant.amount || 0,
+            date: grant.deadline || formatDate(grant.crawled_date) || "No Date",
+            assignee: grant.assignee || "Unassigned",
+            status: grant.is_active ? "In Process" : "Closed",
+            // Keep original data for modal
+            original: grant
+          }));
+          
+          setGrants(formattedGrants);
+        } catch (err) {
+          console.error("Failed to fetch grants:", err);
+          setError('Failed to fetch grants: ' + (err.message || err));
+          // Fall back to sample data
+          setGrants(sampleGrants);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchGrants();
     }, []);
   
-   // Open modal with clicked grant details
-   const openGrantDetails = (grant) => {
-    setSelectedGrant(grant);
-  };
+    // Helper function to format dates
+    const formatDate = (dateString) => {
+      if (!dateString) return null;
+      try {
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+      } catch (e) {
+        return null;
+      }
+    };
   
-  // Close modal
-  const closeGrantDetails = () => {
-    setSelectedGrant(null);
-  }
+    // Open modal with clicked grant details
+    const openGrantDetails = (grant) => {
+      setSelectedGrant(grant.original || grant);
+    };
+  
+    // Close modal
+    const closeGrantDetails = () => {
+      setSelectedGrant(null);
+    }
   
     // Calculate total grant amounts
-    const totalAmount = grants.reduce((sum, grant) => sum + grant.amount, 0);
+    const totalAmount = grants.reduce((sum, grant) => sum + Number(grant.amount || 0), 0);
   
     const filteredGrants = grants.filter(grant => 
-      grant.name.toLowerCase().includes(search.toLowerCase()) &&
+      grant.name?.toLowerCase().includes(search.toLowerCase()) &&
       (filterDate ? grant.date === filterDate : true) &&
       (filterType ? grant.type === filterType : true) &&
-      (filterAssignee ? grant.assignee.toLowerCase().includes(filterAssignee.toLowerCase()) : true)
+      (filterAssignee ? grant.assignee?.toLowerCase().includes(filterAssignee.toLowerCase()) : true)
     );
   
     const handleExport = (type) => {
@@ -136,74 +192,95 @@ const sampleGrants = [
         <div className="dashboard-content">
           <h2>Grants Dashboard</h2>
   
-          <p><strong>Total Grant Amount:</strong> ${totalAmount.toLocaleString()}</p>
+          {/* Show loading state */}
+          {loading && <p>Loading grants...</p>}
+          
+          {/* Show error if any */}
+          {error && (
+            <div className="error-banner">
+              <p>{error}</p>
+              <p>Showing sample data instead.</p>
+            </div>
+          )}
   
-          <GrantStatusChart grants={filteredGrants} />  {/* ✅ Insert chart */}
+          {/* Only show data when not loading */}
+          {!loading && (
+            <>
+              <p><strong>Total Grant Amount:</strong> ${totalAmount.toLocaleString()}</p>
   
-          {/* Search & Filters */}
-          <div className="filter-container">
-            <input 
-              type="text" 
-              placeholder="Search grants..." 
-              value={search} 
-              onChange={(e) => setSearch(e.target.value)} 
-              className="filter-input"
-            />
-            <input 
-              type="date" 
-              value={filterDate} 
-              onChange={(e) => setFilterDate(e.target.value)} 
-              className="filter-input"
-            />
-            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="filter-input">
-              <option value="">All Types</option>
-              <option value="Donation">Donation</option>
-              <option value="Sponsorship">Sponsorship</option>
-              <option value="In-Kind">In-Kind</option>
-            </select>
-            <input 
-              type="text" 
-              placeholder="Filter by Assignee..." 
-              value={filterAssignee} 
-              onChange={(e) => setFilterAssignee(e.target.value)} 
-              className="filter-input"
-            />
-          </div>
-          <div className="export-buttons"> 
-            <button onClick={() => handleExport("pdf")} className="export-button pdf">📄 PRINT / PDF</button>
-            <button onClick={() => handleExport("excel")} className="export-button excel">⬇️ EXPORT</button>
-          </div>
+              <GrantStatusChart grants={filteredGrants} />  {/* ✅ Insert chart */}
   
-          {/* Grants Table */}
-          <table className="grants-table">
-                      <thead>
-                          <tr>
-                              <th>Grant Name</th>
-                              <th>Type</th>
-                              <th>Amount</th>
-                              <th>Date</th>
-                              <th>Assignee</th>
-                              <th>Status</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                        {filteredGrants.map((grant, index) => (
-                          <tr key={index}>
-                            <td>
-                              <button className="grant-title" onClick={() => openGrantDetails(grant)}>
-                                {grant.name}
-                              </button>
-                            </td>
-                            <td>{grant.type}</td>
-                            <td>${grant.amount.toLocaleString()}</td>
-                            <td>{grant.date}</td>
-                            <td>{grant.assignee}</td>
-                            <td>{grant.status}</td>
-                          </tr>
-                        ))}
-                      </tbody>
+              {/* Search & Filters */}
+              <div className="filter-container">
+                <input 
+                  type="text" 
+                  placeholder="Search grants..." 
+                  value={search} 
+                  onChange={(e) => setSearch(e.target.value)} 
+                  className="filter-input"
+                />
+                <input 
+                  type="date" 
+                  value={filterDate} 
+                  onChange={(e) => setFilterDate(e.target.value)} 
+                  className="filter-input"
+                />
+                <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="filter-input">
+                  <option value="">All Types</option>
+                  <option value="Public Health Agency of Canada">Health Canada</option>
+                  <option value="Kindred Foundation">Kindred Foundation</option>
+                  <option value="Ontario Trillium Foundation">Ontario Trillium</option>
+                </select>
+                <input 
+                  type="text" 
+                  placeholder="Filter by Assignee..." 
+                  value={filterAssignee} 
+                  onChange={(e) => setFilterAssignee(e.target.value)} 
+                  className="filter-input"
+                />
+              </div>
+              <div className="export-buttons"> 
+                <button onClick={() => handleExport("pdf")} className="export-button pdf">📄 PRINT / PDF</button>
+                <button onClick={() => handleExport("excel")} className="export-button excel">⬇️ EXPORT</button>
+              </div>
   
-                  </table>
+              {/* Grants Table */}
+              <table className="grants-table">
+                <thead>
+                  <tr>
+                    <th>Grant Name</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Assignee</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredGrants.length > 0 ? (
+                    filteredGrants.map((grant, index) => (
+                      <tr key={index}>
+                        <td>
+                          <button className="grant-title" onClick={() => openGrantDetails(grant)}>
+                            {grant.name}
+                          </button>
+                        </td>
+                        <td>{grant.type}</td>
+                        <td>${Number(grant.amount).toLocaleString()}</td>
+                        <td>{grant.date}</td>
+                        <td>{grant.assignee}</td>
+                        <td>{grant.status}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" style={{textAlign: 'center'}}>No grants found</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </>
+          )}
         </div>
   
         {/* Render the Modal */}

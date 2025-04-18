@@ -9,6 +9,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 1000;
 }
 
 /* Modal Box (Default Size) */
@@ -22,6 +25,18 @@
     position: relative;
     overflow-y: auto;
     transition: all 0.3s ease-in-out;
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Animation for closing */
+.modal-overlay.closing {
+    opacity: 0;
+}
+
+.modal-content.closing {
+    transform: scale(0.95);
+    opacity: 0;
 }
 
 /* Fullscreen Mode */
@@ -137,4 +152,5 @@
 .fullscreen-button:hover {
     background: #6a0dad;
 }
+
 

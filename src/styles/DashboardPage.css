@@ -6,6 +6,25 @@
     background: linear-gradient(135deg, #e0b3ff, #d1a1ff, #c18fff);
   }
   
+  /* Ensure all text content has consistent styling */
+  .dashboard-content h1, 
+  .dashboard-content h2, 
+  .dashboard-content h3, 
+  .dashboard-content h4,
+  .dashboard-content p,
+  .dashboard-content span,
+  .dashboard-content a,
+  .dashboard-content label,
+  .dashboard-content button:not(.export-button):not(.grant-title) {
+    color: #333;
+  }
+  
+  /* Background-colored elements with white text */
+  .dashboard-content .section-heading,
+  .grants-table th,
+  .export-button {
+    color: white;
+  }
   
   /* ============ Sidebar ============ */
   .sidebar {
@@ -97,8 +116,22 @@
     margin: 0;
   }
   
+  /* Dashboard Headings */
+  .dashboard-content h2, 
+  .dashboard-content h3 {
+    color: #333;
+    margin-bottom: 15px;
+  }
   
-  
+  /* Style for section headings with background color */
+  .dashboard-content h2.section-heading,
+  .dashboard-content h3.section-heading {
+    background-color: #7B2CBF;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    display: inline-block;
+  }
   
   .dashboard-title {
     font-size: 22px;
@@ -155,6 +188,7 @@
   .grants-table td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
+    color: #333;
   }
   
   .grants-table tr:hover {
@@ -200,5 +234,16 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
     filter: brightness(1.05);
+  }
+  
+  /* Style for the grant name links */
+  .grant-title {
+    color: #7B2CBF; /* Purple color matching your theme */
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    text-decoration: underline;
+    font-weight: 500;
   }
   
