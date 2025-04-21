@@ -65,6 +65,7 @@
   .sidebar-menu li {
     margin-bottom: 20px;
     text-align: left; /* ✅ Make sure list items also align left */
+    user-select: none; 
   }
   
   .sidebar-menu li a {
@@ -81,6 +82,10 @@
     transition: background 0.3s ease;
   }
   
+  .sidebar-link {
+    width: 100%;
+    color: white;
+  }
   
   .sidebar-menu li a:hover {
     background-color: rgba(255, 255, 255, 0.2);
