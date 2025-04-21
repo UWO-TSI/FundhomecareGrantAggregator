@@ -29,7 +29,7 @@ load_dotenv()
 
 # Supabase configuration
 SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_API_KEY")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 # Initialize Supabase client if credentials are available
 supabase = None
@@ -41,6 +41,9 @@ if SUPABASE_URL and SUPABASE_KEY:
         logger.error(f"Error initializing Supabase client: {e}")
 else:
     logger.warning("Supabase credentials not found. Will save data locally only.")
+    # Debug information
+    logger.info(f"SUPABASE_URL available: {SUPABASE_URL is not None}")
+    logger.info(f"SUPABASE_KEY available: {SUPABASE_KEY is not None}")
 
 def save_to_supabase(grants):
     """
