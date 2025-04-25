@@ -8,9 +8,10 @@ import DashboardPage from "./pages/DashboardPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import SettingsPage from './pages/Settings';
 import PrivateRoute from "./components/PrivateRoute";
+import { Navigate } from "react-router-dom";
 
 export const router = createBrowserRouter([
-    { path: "/", element: <App />}, 
+    { path: "/", element: <Navigate to="/signin" /> },
     { path: "/signup", element: <CreateAccountPage />}, 
     { path: "/signin", element: <LoginPage />},
     { path: "/forgot-password", element: <ForgotPasswordPage />},
@@ -32,4 +33,4 @@ export const router = createBrowserRouter([
             </PrivateRoute>
         ),   
     }, 
-]) 
+]); 

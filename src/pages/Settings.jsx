@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar'; // ✅ Import the Sidebar
 import '../styles/SettingsStyles.css';
+import { UserAuth } from '../context/AuthContext';
 
 const initialUsers = [
   { id: 1, name: 'Rohit', role: 'Assignee' },
@@ -9,7 +10,22 @@ const initialUsers = [
 ];
 
 const SettingsPage = () => {
+  const { userRole } = UserAuth();
   const [users, setUsers] = useState(initialUsers);
+  
+  if(!userRole) return <p>Loading...</p>;
+
+  if (userRole !== "Admin") {
+    return (
+      <div className="dashboard-container">
+        <Sidebar />
+        <div className="dashboard-content">
+          <h2>Access Denied</h2>
+          <p>You do not have permission to view this page.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleRoleChange = (id, newRole) => {
     const updatedUsers = users.map(user =>

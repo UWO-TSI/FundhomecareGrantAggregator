@@ -3,14 +3,19 @@ import { UserAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 
 const PrivateRoute = ({ children }) => {
-    const {session} = UserAuth();
+    const auth = UserAuth();
 
-    if (session === undefined){
-        return <p> Loading... </p>
+    if (!auth) {
+        return <p>Loading auth context...</p>;
     }
 
+    const { session } = auth;
 
-    return <>{session ? <>{children}</> : <Navigate to="/signup" />}</>
-} 
+    if (session === undefined) {
+        return <p>Loading session...</p>;
+    }
+
+    return session ? <>{children}</> : <Navigate to="/signup" />;
+};
 
 export default PrivateRoute;

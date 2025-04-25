@@ -2,13 +2,15 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/DashboardPage.css';
 import logo from '../assets/fundhomecarelogo.png';
+import { UserAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
     const navigate = useNavigate();
+    const { userRole } = UserAuth();
 
     const handleLogout = () => {
         localStorage.removeItem("user");
-        navigate("/");
+        navigate("/signin");
     };
 
     return (
@@ -18,9 +20,11 @@ const Sidebar = () => {
                 <li>
                     <Link to="/dashboard">📄 Grants</Link>
                 </li>
-                <li>
+                {userRole === "Admin" && (
+                  <li>
                     <Link to="/settings">⚙️ Settings</Link>
-                </li>
+                  </li>
+                )}
             </ul>
             <button onClick={handleLogout} className="logout-button">Logout</button>
         </div>
