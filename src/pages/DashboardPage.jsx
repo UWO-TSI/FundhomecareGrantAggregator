@@ -106,28 +106,17 @@ const sampleGrants = [
     const handleExport = (type) => {
       if (type === "pdf") {
         const doc = new jsPDF();
-    
-        // Load image
-        const img = new Image();
-        img.src = "/fundhomecarelogo.png"; 
-    
-        img.onload = function () {
-          // Add the logo to the PDF
-          doc.addImage(img, "PNG", 14, 10, 40, 15); // (image, format, x, y, width, height)
-    
-          // Title
+      
+        const generatePDF = () => {
           doc.setFontSize(18);
           doc.setTextColor(80, 0, 140);
           doc.text("Grants Report", 60, 20);
-    
-          // Timestamp
+      
           const now = new Date();
-          const formattedDate = now.toLocaleString();
           doc.setFontSize(10);
           doc.setTextColor(100);
-          doc.text(`Generated: ${formattedDate}`, 14, 30);
-    
-          // Table
+          doc.text(`Generated: ${now.toLocaleString()}`, 14, 30);
+      
           autoTable(doc, {
             startY: 35,
             head: [["Grant Name", "Type", "Amount", "Date", "Assignee", "Status"]],
@@ -140,29 +129,28 @@ const sampleGrants = [
               g.status,
             ]),
             theme: "grid",
-            styles: {
-              font: "helvetica",
-              fontSize: 10,
-              textColor: "#333333",
-            },
-            headStyles: {
-              fillColor: [138, 43, 226],
-              textColor: "#ffffff",
-              fontStyle: "bold",
-            },
-            alternateRowStyles: {
-              fillColor: [245, 240, 255],
-            },
+            styles: { fontSize: 10 },
+            headStyles: { fillColor: [138, 43, 226], textColor: "#fff" },
+            alternateRowStyles: { fillColor: [245, 240, 255] },
           });
-    
-          // Footer
-          doc.setFontSize(12);
-          doc.setTextColor(0);
+      
           doc.text("Approved by: _______________________", 14, doc.lastAutoTable.finalY + 20);
-    
           doc.save("grants-report.pdf");
         };
-      }
+      
+        const img = new Image();
+        img.src = "/fundhomecarelogo.png";
+      
+        img.onload = function () {
+          doc.addImage(img, "PNG", 14, 10, 40, 15);
+          generatePDF();
+        };
+      
+        img.onerror = function () {
+          console.warn("Logo image failed to load, continuing without it.");
+          generatePDF();
+        };
+      }      
     
       if (type === "excel") {
         const worksheetData = filteredGrants.map((g) => ({
