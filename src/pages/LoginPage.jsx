@@ -13,7 +13,11 @@ const LoginPage = () => {
     const [isAdmin, setIsAdmin] = useState(false); // Toggle between Admin & User
     const [rememberMe, setRememberMe] = useState(false);
 
-    const { session, signInUser } = UserAuth();
+    const auth = UserAuth();
+    const session = auth?.session;
+    const signInUser = auth?.signInUser;
+    const userRole = auth?.userRole;
+
     const navigate = useNavigate();
 
     const handleSignIn = async (e) => {

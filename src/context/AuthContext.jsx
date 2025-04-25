@@ -41,7 +41,7 @@ export const AuthContextProvider = ({ children }) => {
         }
     }
 
-    const {userRole, setUserRole} = useState(null);
+    const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
         supabase.auth.getSession().then(async ({ data: { session } }) =>{
@@ -51,31 +51,33 @@ export const AuthContextProvider = ({ children }) => {
                     .from("profiles")
                     .select("role")
                     .eq("id", session.user.id)
-                    .single();
+                    .maybeSingle();
                 if (error) {
                     console.error("Error fetching user role: ", error);
+                    setUserRole(null);
                 } else {
                     setUserRole(data.role);
                 }
             }
         });
 
-        supabase.auth.onAuthStateChange((_event, session) => {
+        supabase.auth.onAuthStateChange(async (_event, session) => {
             setSession(session);
             if(session?.user) {
-                const {data, error} = supabase
+                const {data, error} = await supabase
                     .from("profiles")
                     .select("role")
                     .eq("id", session.user.id)
                     .single();
 
-                if (error) {
+                if (error || !data) {
                     console.error("Error fetching user role: ", error);
+                    setUserRole(null);
                 } else {
                     setUserRole(data.role);
                 }
             }
-        })
+        });
     },[])
 
     // Signout
