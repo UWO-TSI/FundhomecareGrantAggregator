@@ -18,21 +18,21 @@ const sampleGrants = [
   
   const DashboardPage = () => {
     const [grants, setGrants] = useState([]);
+    const [grantDetails, setGrantDetails] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedGrant, setSelectedGrant] = useState(null);
+    const [shouldScrollToNotes, setShouldScrollToNotes] = useState(false);
     const [search, setSearch] = useState("");
     const [filterDate, setFilterDate] = useState("");
     const [filterType, setFilterType] = useState("");
     const [filterAssignee, setFilterAssignee] = useState("");
   
-    // Fetch grants from Supabase
     useEffect(() => {
       const fetchGrants = async () => {
         try {
           setLoading(true);
           
-          // Make sure to log any errors in the console
           console.log("Fetching grants from Supabase...");
           
           const { data, error } = await supabase
@@ -46,7 +46,6 @@ const sampleGrants = [
           
           console.log("Grants fetched:", data);
           
-          // Transform data for dashboard display
           const formattedGrants = data.map(grant => ({
             name: grant.title || "Untitled Grant",
             type: grant.funding_agency || "Unknown",
@@ -54,15 +53,15 @@ const sampleGrants = [
             date: grant.deadline || formatDate(grant.crawled_date) || "No Date",
             assignee: grant.assignee || "Unassigned",
             status: grant.is_active ? "In Process" : "Closed",
-            // Keep original data for modal
             original: grant
           }));
           
           setGrants(formattedGrants);
+          
+          await fetchAllGrantDetails(data);
         } catch (err) {
           console.error("Failed to fetch grants:", err);
           setError('Failed to fetch grants: ' + (err.message || err));
-          // Fall back to sample data
           setGrants(sampleGrants);
         } finally {
           setLoading(false);
@@ -71,6 +70,35 @@ const sampleGrants = [
 
       fetchGrants();
     }, []);
+  
+    const fetchAllGrantDetails = async (grantsData) => {
+      try {
+        if (!grantsData || grantsData.length === 0) return;
+        
+        const grantIds = grantsData.map(grant => grant.grant_id);
+        
+        const { data, error } = await supabase
+          .from('GrantDetails')
+          .select('*')
+          .in('grant_id', grantIds);
+        
+        if (error) {
+          console.error("Error fetching grant details:", error);
+          return;
+        }
+        
+        const detailsMap = {};
+        if (data) {
+          data.forEach(detail => {
+            detailsMap[detail.grant_id] = detail;
+          });
+        }
+        
+        setGrantDetails(detailsMap);
+      } catch (error) {
+        console.error("Error fetching all grant details:", error);
+      }
+    };
   
     // Helper function to format dates
     const formatDate = (dateString) => {
@@ -84,14 +112,39 @@ const sampleGrants = [
     };
   
     // Open modal with clicked grant details
-    const openGrantDetails = (grant) => {
+    const openGrantDetails = (grant, scrollToNotes = false) => {
       setSelectedGrant(grant.original || grant);
+      setShouldScrollToNotes(scrollToNotes);
     };
   
-    // Close modal
-    const closeGrantDetails = () => {
+    const closeGrantDetails = async () => {
+      if (selectedGrant) {
+        // Refresh grant details for this specific grant
+        try {
+          const grantId = selectedGrant.id || selectedGrant.grant_id;
+          
+          if (grantId) {
+            const { data, error } = await supabase
+              .from('GrantDetails')
+              .select('*')
+              .eq('grant_id', grantId)
+              .single();
+            
+            if (!error && data) {
+              // Update the local state with the new details
+              setGrantDetails(prev => ({
+                ...prev,
+                [grantId]: data
+              }));
+            }
+          }
+        } catch (error) {
+          console.error("Error refreshing grant details:", error);
+        }
+      }
+      
       setSelectedGrant(null);
-    }
+    };
   
     // Calculate total grant amounts
     const totalAmount = grants.reduce((sum, grant) => sum + Number(grant.amount || 0), 0);
@@ -105,52 +158,121 @@ const sampleGrants = [
   
     const handleExport = (type) => {
       if (type === "pdf") {
-        const doc = new jsPDF();
-      
-        const generatePDF = () => {
-          doc.setFontSize(18);
-          doc.setTextColor(80, 0, 140);
-          doc.text("Grants Report", 60, 20);
-      
-          const now = new Date();
-          doc.setFontSize(10);
-          doc.setTextColor(100);
-          doc.text(`Generated: ${now.toLocaleString()}`, 14, 30);
-      
-          autoTable(doc, {
-            startY: 35,
-            head: [["Grant Name", "Type", "Amount", "Date", "Assignee", "Status"]],
-            body: filteredGrants.map((g) => [
-              g.name,
-              g.type,
-              `$${g.amount.toLocaleString()}`,
-              g.date,
-              g.assignee,
-              g.status,
-            ]),
-            theme: "grid",
-            styles: { fontSize: 10 },
-            headStyles: { fillColor: [138, 43, 226], textColor: "#fff" },
-            alternateRowStyles: { fillColor: [245, 240, 255] },
-          });
-      
-          doc.text("Approved by: _______________________", 14, doc.lastAutoTable.finalY + 20);
-          doc.save("grants-report.pdf");
-        };
-      
-        const img = new Image();
-        img.src = "/fundhomecarelogo.png";
-      
-        img.onload = function () {
-          doc.addImage(img, "PNG", 14, 10, 40, 15);
-          generatePDF();
-        };
-      
-        img.onerror = function () {
-          console.warn("Logo image failed to load, continuing without it.");
-          generatePDF();
-        };
-      }      
+        try {
+          const doc = new jsPDF();
+          let pdfGenerated = false;
+    
+          const chartElement = document.querySelector('canvas');
+          let chartDataURL = null;
+    
+          if (chartElement) {
+            try {
+              chartDataURL = chartElement.toDataURL('image/png');
+            } catch (err) {
+              console.error("Error capturing chart:", err);
+            }
+          }
+    
+          const logoPath = import.meta.env.BASE_URL + "src/assets/fundhomecarelogo.png";
+          const img = new Image();
+          img.crossOrigin = "Anonymous"; 
+          img.src = "/src/assets/fundhomecarelogo.png"; 
+    
+          const generatePDF = () => {
+            if (pdfGenerated) return;
+            pdfGenerated = true;
+            
+            try {
+              if (img.complete && img.naturalHeight !== 0) {
+                try {
+                  doc.addImage(img, "PNG", 14, 10, 40, 15);
+                } catch (err) {
+                  console.error("Error adding logo to PDF:", err);
+                }
+              }
+    
+              doc.setFontSize(22);
+              doc.setTextColor(123, 44, 191); 
+              doc.text("Grant Status Overview", 60, 20);
+    
+              const now = new Date();
+              const formattedDate = now.toLocaleString();
+              doc.setFontSize(10);
+              doc.setTextColor(100);
+              doc.text(`Generated: ${formattedDate}`, 14, 30);
+    
+              doc.setFontSize(14);
+              doc.setTextColor(0);
+              doc.text(`Total Grant Amount: $${totalAmount.toLocaleString()}`, 14, 40);
+              
+              let yPosition = 45;
+              if (chartDataURL) {
+                try {
+                  doc.addImage(chartDataURL, 'PNG', 60, yPosition, 80, 80);
+                  yPosition += 90;
+                } catch (err) {
+                  console.error("Error adding chart to PDF:", err);
+                  yPosition += 10;
+                }
+              } else {
+                yPosition += 10;
+              }
+    
+              // Table
+              autoTable(doc, {
+                startY: yPosition,
+                head: [["Grant Name", "Type", "Amount", "Date", "Assignee", "Status"]],
+                body: filteredGrants.map((g) => [
+                  g.name,
+                  g.type,
+                  `$${Number(g.amount || 0).toLocaleString()}`,
+                  g.date,
+                  g.assignee,
+                  g.status,
+                ]),
+                theme: "grid",
+                styles: {
+                  font: "helvetica",
+                  fontSize: 10,
+                  textColor: "#333333",
+                },
+                headStyles: {
+                  fillColor: [123, 44, 191], // Purple color
+                  textColor: "#ffffff",
+                  fontStyle: "bold",
+                },
+                alternateRowStyles: {
+                  fillColor: [245, 240, 255],
+                },
+              });
+    
+              // Footer
+              doc.setFontSize(12);
+              doc.setTextColor(0);
+              doc.text("Fund Home Care Canada", 14, doc.lastAutoTable.finalY + 20);
+              doc.text("Approved by: _______________________", 120, doc.lastAutoTable.finalY + 20);
+    
+              // Save the PDF
+              doc.save("grant-dashboard-report.pdf");
+            } catch (err) {
+              console.error("Error generating PDF:", err);
+              alert("There was an error generating the PDF. Please try again.");
+            }
+          };
+    
+          img.onload = generatePDF;
+          
+          img.onerror = () => {
+            console.error("Failed to load logo image");
+            generatePDF(); 
+          };
+          
+          setTimeout(generatePDF, 1000);
+        } catch (err) {
+          console.error("Error in PDF generation:", err);
+          alert("There was an error generating the PDF. Please try again.");
+        }
+      }
     
       if (type === "excel") {
         const worksheetData = filteredGrants.map((g) => ({
@@ -242,27 +364,59 @@ const sampleGrants = [
                     <th>Date</th>
                     <th>Assignee</th>
                     <th>Status</th>
+                    <th>Notes</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredGrants.length > 0 ? (
-                    filteredGrants.map((grant, index) => (
-                      <tr key={index}>
-                        <td>
-                          <button className="grant-title" onClick={() => openGrantDetails(grant)}>
-                            {grant.name}
-                          </button>
-                        </td>
-                        <td>{grant.type}</td>
-                        <td>${Number(grant.amount).toLocaleString()}</td>
-                        <td>{grant.date}</td>
-                        <td>{grant.assignee}</td>
-                        <td>{grant.status}</td>
-                      </tr>
-                    ))
+                    filteredGrants.map((grant, index) => {
+                      const grantId = grant.original?.grant_id;
+                      const hasNotes = grantId && grantDetails[grantId];
+                      
+                      return (
+                        <tr key={index}>
+                          <td>
+                            <button className="grant-title" onClick={() => openGrantDetails(grant)}>
+                              {grant.name}
+                            </button>
+                          </td>
+                          <td>{grant.type}</td>
+                          <td>${Number(grant.amount).toLocaleString()}</td>
+                          <td>{grant.date}</td>
+                          <td>{grant.assignee}</td>
+                          <td>{grant.status}</td>
+                          <td>
+                            {hasNotes ? (
+                              <span 
+                                className="notes-indicator" 
+                                title="Click to view notes"
+                                onClick={(e) => {
+                                  e.stopPropagation(); // Prevent row click from triggering
+                                  openGrantDetails(grant, true);
+                                }}
+                              >
+                                📝
+                              </span>
+                            ) : (
+                              <span 
+                                className="notes-indicator" 
+                                title="No notes yet - click to add"
+                                onClick={(e) => {
+                                  e.stopPropagation(); // Prevent row click from triggering
+                                  openGrantDetails(grant, true);
+                                }}
+                                style={{ opacity: 0.4 }}
+                              >
+                                📝
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
-                      <td colSpan="6" style={{textAlign: 'center'}}>No grants found</td>
+                      <td colSpan="7" style={{textAlign: 'center'}}>No grants found</td>
                     </tr>
                   )}
                 </tbody>
@@ -272,7 +426,13 @@ const sampleGrants = [
         </div>
   
         {/* Render the Modal */}
-        {selectedGrant && <GrantDetailsModal grant={selectedGrant} onClose={closeGrantDetails} />}
+        {selectedGrant && (
+          <GrantDetailsModal 
+            grant={selectedGrant} 
+            onClose={closeGrantDetails}
+            scrollToNotes={shouldScrollToNotes}
+          />
+        )}
       </div>
     );
   };
