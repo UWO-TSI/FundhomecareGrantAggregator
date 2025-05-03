@@ -259,3 +259,22 @@
     overflow-x: auto; /* Allows horizontal scrolling on smaller screens */
   }
   
+
+  .notes-indicator {
+    display: inline-block;
+    font-size: 1.2rem;
+    color: #7B2CBF;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .notes-indicator:hover {
+    transform: scale(1.2);
+  }
+
+  .grants-table th:last-child,
+  .grants-table td:last-child {
+    width: 60px;
+    text-align: center;
+  }
+  
