@@ -34,13 +34,14 @@
     background: linear-gradient(180deg, #5E1F77 0%, #8B6DBD 100%);
     color: white;
     padding: 20px;
-    width: 220px; /* Slightly narrower */
-    height: 100vh;
+    width: 220px;
+    flex: 0 0 auto; /* prevent flex from stretching it */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   }
+  
   
   .sidebar-logo-container {
     width: 100%;
@@ -103,8 +104,6 @@
     cursor: pointer;
     border-radius: 5px;
     width: 100%;
-    position: sticky;
-    bottom: 20px;
     transition: background 0.2s ease;
   }
   
