@@ -22,7 +22,7 @@ export const AuthContextProvider = ({ children }) => {
             return { success: true, data };
     };
 
-    // Sign in
+     // Sign in
     const signInUser = async ( email, password ) => {
         try {
             const {data, error} = await supabase.auth.signInWithPassword({
@@ -41,43 +41,14 @@ export const AuthContextProvider = ({ children }) => {
         }
     }
 
-    const [userRole, setUserRole] = useState(null);
-
     useEffect(() => {
-        supabase.auth.getSession().then(async ({ data: { session } }) =>{
+        supabase.auth.getSession().then(({ data: { session } }) =>{
             setSession(session);
-            if (session?.user) {
-                const {data, error} = await supabase
-                    .from("profiles")
-                    .select("role")
-                    .eq("id", session.user.id)
-                    .maybeSingle();
-                if (error) {
-                    console.error("Error fetching user role: ", error);
-                    setUserRole(null);
-                } else {
-                    setUserRole(data.role);
-                }
-            }
-        });
+        })
 
-        supabase.auth.onAuthStateChange(async (_event, session) => {
+        supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
-            if(session?.user) {
-                const {data, error} = await supabase
-                    .from("profiles")
-                    .select("role")
-                    .eq("id", session.user.id)
-                    .single();
-
-                if (error || !data) {
-                    console.error("Error fetching user role: ", error);
-                    setUserRole(null);
-                } else {
-                    setUserRole(data.role);
-                }
-            }
-        });
+        })
     },[])
 
     // Signout
@@ -148,7 +119,7 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     return(
-        <AuthContext.Provider value={{ session , userRole, signUpNewUser, signOut, signInUser, sendForgotPasswordEmail, otpSignIn, updatePassword }}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={{ session , signUpNewUser, signOut, signInUser, sendForgotPasswordEmail, otpSignIn, updatePassword }}>{children}</AuthContext.Provider>
     )
 };
 

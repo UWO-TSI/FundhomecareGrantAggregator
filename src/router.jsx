@@ -11,9 +11,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import { Navigate } from "react-router-dom";
 
 export const router = createBrowserRouter([
-    { path: "/", element: <Navigate to="/signin" /> },
-    { path: "/signup", element: <CreateAccountPage />}, 
-    { path: "/signin", element: <LoginPage />},
+    { path: "/", element: <LoginPage /> },
+    { path: "/create-account", element: <CreateAccountPage />},
     { path: "/forgot-password", element: <ForgotPasswordPage />},
     { path: "/update-password", element: <UpdatePasswordPage />},
     { path: "/settings", element: <SettingsPage />},
@@ -33,4 +32,4 @@ export const router = createBrowserRouter([
             </PrivateRoute>
         ),   
     }, 
-]); 
+]);

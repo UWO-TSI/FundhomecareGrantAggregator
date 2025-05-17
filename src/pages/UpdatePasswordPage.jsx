@@ -50,7 +50,7 @@ function UpdatePasswordPage() {
                 if (result && result.success) {
                     setError('Password updated successfully! You will be redirected to the login page.');
                     setTimeout(() => {
-                        navigate('/signin');
+                        navigate('/');
                     }, 2000);
                 }
 
@@ -65,13 +65,11 @@ function UpdatePasswordPage() {
     };
 
     return (
-        <div className="update-password-container">
-        <div className="update-password-wrapper">
+        <div className="auth-page-container">
             <h2 className="auth-title">Update Your Password</h2>
             <p className="auth-description">Enter your new password.</p>
             {error && <p className={error.includes('successfully') ? 'success-message' : 'error-message'}>{error}</p>}
-            
-            {token ? (
+            {token && (
                 <form onSubmit={handleSubmit} className="auth-form">
                     <input
                         type="password"
@@ -91,11 +89,8 @@ function UpdatePasswordPage() {
                         {loading ? 'Updating...' : 'Update Password'}
                     </button>
                 </form>
-            
-            ) : (
-            <p>Please click the link in your email to reset your password.</p>
-        )}
-        </div>
+            )}
+            {!token && !error && <p>Please click the link in your email to reset your password.</p>}
         </div>
     );
 }

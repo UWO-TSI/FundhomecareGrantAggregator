@@ -11,19 +11,10 @@ import { AuthContextProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <AuthContextProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/create-account" element={<CreateAccountPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/update-password" element={<UpdatePasswordPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
-      </Router>
-    </AuthContextProvider>
+    /* Begin application on login page. */
+    <>
+      <LoginPage />
+    </>
   );
 }
 
