@@ -10,6 +10,7 @@ import { saveAs } from "file-saver";
 import GrantDetailsModal from './GrantDetailsModal';
 import GrantStatusChart from '../components/GrantStatusChart';
 import supabase from '../supabase-client';
+import AddGrantModal from './AddGrantModal';
 
 const sampleGrants = [
     { name: "Cancer Research Fund", type: "Donation", amount: 50000, date: "2024-01-15", assignee: "Alice", status: "In Process" },
@@ -17,6 +18,7 @@ const sampleGrants = [
   ];
   
   const DashboardPage = () => {
+    const { userRole } = UserAuth();
     const [grants, setGrants] = useState([]);
     const [grantDetails, setGrantDetails] = useState({});
     const [loading, setLoading] = useState(true);
@@ -27,49 +29,53 @@ const sampleGrants = [
     const [filterDate, setFilterDate] = useState("");
     const [filterType, setFilterType] = useState("");
     const [filterAssignee, setFilterAssignee] = useState("");
+    const [showAddGrantModal, setShowAddGrantModal] = useState(false);
+    const [grantToEdit, setGrantToEdit] = useState(null);
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [grantToDelete, setGrantToDelete] = useState(null);
   
     useEffect(() => {
-      const fetchGrants = async () => {
-        try {
-          setLoading(true);
-          
-          console.log("Fetching grants from Supabase...");
-          
-          const { data, error } = await supabase
-            .from('Grant')
-            .select('*');
-          
-          if (error) {
-            console.error("Supabase error:", error);
-            throw error;
-          }
-          
-          console.log("Grants fetched:", data);
-          
-          const formattedGrants = data.map(grant => ({
-            name: grant.title || "Untitled Grant",
-            type: grant.funding_agency || "Unknown",
-            amount: grant.amount || 0,
-            date: grant.deadline || formatDate(grant.crawled_date) || "No Date",
-            assignee: grant.assignee || "Unassigned",
-            status: grant.is_active ? "In Process" : "Closed",
-            original: grant
-          }));
-          
-          setGrants(formattedGrants);
-          
-          await fetchAllGrantDetails(data);
-        } catch (err) {
-          console.error("Failed to fetch grants:", err);
-          setError('Failed to fetch grants: ' + (err.message || err));
-          setGrants(sampleGrants);
-        } finally {
-          setLoading(false);
-        }
-      };
-
       fetchGrants();
     }, []);
+  
+    const fetchGrants = async () => {
+      try {
+        setLoading(true);
+        
+        console.log("Fetching grants from Supabase...");
+        
+        const { data, error } = await supabase
+          .from('Grant')
+          .select('*');
+        
+        if (error) {
+          console.error("Supabase error:", error);
+          throw error;
+        }
+        
+        console.log("Grants fetched:", data);
+        
+        const formattedGrants = data.map(grant => ({
+          name: grant.title || "Untitled Grant",
+          type: grant.funding_agency || "Unknown",
+          amount: grant.amount || 0,
+          date: grant.deadline || formatDate(grant.crawled_date) || "No Date",
+          assignee: grant.assignee || "Unassigned",
+          status: grant.is_active ? "In Process" : "Closed",
+          original: grant
+        }));
+        
+        setGrants(formattedGrants);
+        
+        await fetchAllGrantDetails(data);
+      } catch (err) {
+        console.error("Failed to fetch grants:", err);
+        setError('Failed to fetch grants: ' + (err.message || err));
+        setGrants(sampleGrants);
+      } finally {
+        setLoading(false);
+      }
+    };
   
     const fetchAllGrantDetails = async (grantsData) => {
       try {
@@ -156,6 +162,71 @@ const sampleGrants = [
       (filterAssignee ? grant.assignee?.toLowerCase().includes(filterAssignee.toLowerCase()) : true)
     );
   
+    // Handlers for the add/edit modal
+    const handleOpenAddGrantModal = () => {
+      setGrantToEdit(null);
+      setShowAddGrantModal(true);
+    };
+
+    const handleEditGrant = (grant) => {
+      setGrantToEdit(grant.original || grant);
+      setShowAddGrantModal(true);
+    };
+
+    const handleCloseAddGrantModal = () => {
+      setShowAddGrantModal(false);
+      setGrantToEdit(null);
+    };
+
+    const handleGrantSubmit = async (updatedGrant) => {
+      console.log("Grant saved:", updatedGrant);
+      // Refresh the grants list
+      await fetchGrants();
+    };
+
+    const handleDeleteGrant = (grant) => {
+      setGrantToDelete(grant.original || grant);
+      setIsDeleteConfirmOpen(true);
+    };
+
+    const confirmDeleteGrant = async () => {
+      if (!grantToDelete) return;
+      
+      try {
+        setLoading(true);
+        const { error } = await supabase
+          .from('Grant')
+          .delete()
+          .eq('grant_id', grantToDelete.grant_id);
+          
+        if (error) {
+          console.error("Error deleting grant:", error);
+          alert("Failed to delete grant: " + error.message);
+        } else {
+          console.log("Grant deleted successfully");
+          // Also delete related details if they exist
+          await supabase
+            .from('GrantDetails')
+            .delete()
+            .eq('grant_id', grantToDelete.grant_id);
+            
+          // Refresh grant list
+          await fetchGrants();
+        }
+      } catch (err) {
+        console.error("Error during delete:", err);
+      } finally {
+        setIsDeleteConfirmOpen(false);
+        setGrantToDelete(null);
+        setLoading(false);
+      }
+    };
+
+    const cancelDelete = () => {
+      setIsDeleteConfirmOpen(false);
+      setGrantToDelete(null);
+    };
+
     const handleExport = (type) => {
       if (type === "pdf") {
         try {
@@ -349,9 +420,18 @@ const sampleGrants = [
                   className="filter-input"
                 />
               </div>
-              <div className="export-buttons"> 
-                <button onClick={() => handleExport("pdf")} className="export-button pdf">📄 PRINT / PDF</button>
-                <button onClick={() => handleExport("excel")} className="export-button excel">⬇️ EXPORT</button>
+              <div className="filter-export-buttons">
+                <button onClick={() => handleExport("pdf")} className="action-button print-pdf-button">
+                  <i className="fas fa-print"></i> PRINT / PDF
+                </button>
+                <button onClick={() => handleExport("excel")} className="action-button export-button">
+                  <i className="fas fa-file-excel"></i> EXPORT
+                </button>
+                {userRole === 'admin' && (
+                  <button onClick={handleOpenAddGrantModal} className="action-button add-grant-button">
+                    <i className="fas fa-plus"></i> ADD GRANT
+                  </button>
+                )}
               </div>
   
               {/* Grants Table */}
@@ -365,6 +445,7 @@ const sampleGrants = [
                     <th>Assignee</th>
                     <th>Status</th>
                     <th>Notes</th>
+                    {userRole === 'admin' && <th>Actions</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -411,12 +492,36 @@ const sampleGrants = [
                               </span>
                             )}
                           </td>
+                          {userRole === 'admin' && (
+                            <td className="action-buttons">
+                              <button 
+                                className="edit-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditGrant(grant);
+                                }}
+                                title="Edit Grant"
+                              >
+                                ✏️
+                              </button>
+                              <button 
+                                className="delete-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteGrant(grant);
+                                }}
+                                title="Delete Grant"
+                              >
+                                🗑️
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       );
                     })
                   ) : (
                     <tr>
-                      <td colSpan="7" style={{textAlign: 'center'}}>No grants found</td>
+                      <td colSpan={userRole === 'admin' ? "8" : "7"} style={{textAlign: 'center'}}>No grants found</td>
                     </tr>
                   )}
                 </tbody>
@@ -425,13 +530,39 @@ const sampleGrants = [
           )}
         </div>
   
-        {/* Render the Modal */}
+        {/* Render the Grant Details Modal */}
         {selectedGrant && (
           <GrantDetailsModal 
             grant={selectedGrant} 
             onClose={closeGrantDetails}
             scrollToNotes={shouldScrollToNotes}
           />
+        )}
+
+        {/* Render the Add/Edit Grant Modal */}
+        {showAddGrantModal && (
+          <AddGrantModal
+            isOpen={showAddGrantModal}
+            onClose={handleCloseAddGrantModal}
+            onSubmit={handleGrantSubmit}
+            existingGrant={grantToEdit}
+          />
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {isDeleteConfirmOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content" style={{ maxWidth: '400px' }}>
+              <h2>Confirm Delete</h2>
+              <p>Are you sure you want to delete the grant "{grantToDelete?.title || 'Unknown'}"?</p>
+              <p>This action cannot be undone.</p>
+              
+              <div className="modal-actions">
+                <button onClick={confirmDeleteGrant} className="form-button delete">Delete</button>
+                <button onClick={cancelDelete} className="form-button cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     );

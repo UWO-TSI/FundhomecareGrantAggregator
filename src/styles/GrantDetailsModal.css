@@ -165,4 +165,144 @@
     scroll-margin-top: 20px;
 }
 
+/* Grant form styles */
+.grant-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.grant-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-weight: 500;
+}
+
+.grant-form input,
+.grant-form select,
+.grant-form textarea {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.grant-form textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.grant-form .checkbox-label {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.grant-form .checkbox-label input {
+    margin: 0;
+    width: auto;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-button {
+    background: #8a2be2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.form-button:hover {
+    background: #6a0dad;
+}
+
+.form-button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+.form-button.cancel {
+    background: #777;
+}
+
+.form-button.cancel:hover {
+    background: #555;
+}
+
+.form-button.delete {
+    background: #e74c3c;
+}
+
+.form-button.delete:hover {
+    background: #c0392b;
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border-left: 4px solid #c62828;
+}
+
+/* Action buttons in table */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-button, .delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 3px;
+    transition: background-color 0.3s;
+}
+
+.edit-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.delete-button:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+/* Grant title in table */
+.grant-title {
+    background: none;
+    border: none;
+    color: #8a2be2;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    text-decoration: none;
+}
+
+.grant-title:hover {
+    text-decoration: underline;
+}
+
+/* Notes indicator */
+.notes-indicator {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.notes-indicator:hover {
+    transform: scale(1.1);
+}
+
 

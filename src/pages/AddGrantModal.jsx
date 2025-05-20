@@ -1,92 +1,191 @@
 import React, { useState } from "react";
 import "../styles/GrantDetailsModal.css";
+import supabase from "../supabase-client";
 
-const AddGrantModal = ({ isOpen, onClose, onSubmit }) => {
+const AddGrantModal = ({ isOpen, onClose, onSubmit, existingGrant = null }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    type: "Donation",
-    amount: "",
-    status: "In Process",
-    assignee: "",
-    date: "",
+    title: existingGrant?.title || "",
+    funding_agency: existingGrant?.funding_agency || "",
+    amount: existingGrant?.amount || "",
+    deadline: existingGrant?.deadline || "",
+    assignee: existingGrant?.assignee || "",
+    description: existingGrant?.description || "",
+    eligibility_criteria: existingGrant?.eligibility_criteria || "",
+    application_url: existingGrant?.application_url || "",
+    is_active: existingGrant?.is_active ?? true,
   });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   if (!isOpen) return null;
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, type, checked } = e.target;
+    setFormData({ 
+      ...formData, 
+      [name]: type === 'checkbox' ? checked : value 
+    });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    onClose();
-    setFormData({
-      name: "",
-      type: "Donation",
-      amount: "",
-      status: "In Process",
-      assignee: "",
-      date: "",
-    });
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      // Format data properly for the database
+      const grantData = {
+        ...formData,
+        amount: formData.amount ? parseFloat(formData.amount) : null,
+        is_active: !!formData.is_active,
+        last_updated: new Date().toISOString()
+      };
+      
+      let result;
+      
+      // Update existing grant or create a new one
+      if (existingGrant?.grant_id) {
+        const { data, error } = await supabase
+          .from('Grant')
+          .update(grantData)
+          .eq('grant_id', existingGrant.grant_id)
+          .select();
+          
+        if (error) throw error;
+        result = data[0];
+      } else {
+        // Add new grant
+        grantData.crawled_date = new Date().toISOString();
+        
+        const { data, error } = await supabase
+          .from('Grant')
+          .insert([grantData])
+          .select();
+          
+        if (error) throw error;
+        result = data[0];
+      }
+      
+      onSubmit && onSubmit(result);
+      onClose();
+    } catch (err) {
+      console.error("Error saving grant:", err);
+      setError(err.message || "Failed to save grant. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Add New Grant</h2>
+        <h2>{existingGrant ? 'Edit Grant' : 'Add New Grant'}</h2>
+        {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit} className="grant-form">
-          <input
-            type="text"
-            name="name"
-            placeholder="Grant Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+          <label>
+            Grant Title
+            <input
+              type="text"
+              name="title"
+              placeholder="Grant Title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+            />
+          </label>
 
-          <select name="type" value={formData.type} onChange={handleChange}>
-            <option value="Donation">Donation</option>
-            <option value="Sponsorship">Sponsorship</option>
-            <option value="In-Kind">In-Kind</option>
-          </select>
+          <label>
+            Funding Agency
+            <input
+              type="text"
+              name="funding_agency"
+              placeholder="Funding Agency"
+              value={formData.funding_agency}
+              onChange={handleChange}
+              required
+            />
+          </label>
 
-          <input
-            type="number"
-            name="amount"
-            placeholder="Amount"
-            value={formData.amount}
-            onChange={handleChange}
-            required
-          />
+          <label>
+            Amount
+            <input
+              type="number"
+              name="amount"
+              placeholder="Amount"
+              value={formData.amount}
+              onChange={handleChange}
+            />
+          </label>
 
-          <select name="status" value={formData.status} onChange={handleChange}>
-            <option value="In Process">In Process</option>
-            <option value="Applied">Applied</option>
-            <option value="Granted">Granted</option>
-            <option value="Not Granted">Not Granted</option>
-          </select>
+          <label>
+            Deadline
+            <input
+              type="date"
+              name="deadline"
+              value={formData.deadline}
+              onChange={handleChange}
+            />
+          </label>
 
-          <input
-            type="text"
-            name="assignee"
-            placeholder="Assignee Name"
-            value={formData.assignee}
-            onChange={handleChange}
-            required
-          />
+          <label>
+            Assignee
+            <input
+              type="text"
+              name="assignee"
+              placeholder="Assignee Name"
+              value={formData.assignee}
+              onChange={handleChange}
+            />
+          </label>
 
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
-          />
+          <label>
+            Description
+            <textarea
+              name="description"
+              placeholder="Grant Description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={3}
+            />
+          </label>
+
+          <label>
+            Eligibility Criteria
+            <textarea
+              name="eligibility_criteria"
+              placeholder="Eligibility criteria"
+              value={formData.eligibility_criteria}
+              onChange={handleChange}
+              rows={3}
+            />
+          </label>
+
+          <label>
+            Application URL
+            <input
+              type="text"
+              name="application_url"
+              placeholder="Application URL"
+              value={formData.application_url}
+              onChange={handleChange}
+            />
+          </label>
+
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              name="is_active"
+              checked={formData.is_active}
+              onChange={handleChange}
+            />
+            Active/In Process
+          </label>
 
           <div className="modal-actions">
-            <button type="submit" className="form-button">Submit</button>
+            <button type="submit" className="form-button" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Submit'}
+            </button>
             <button type="button" onClick={onClose} className="form-button cancel">Cancel</button>
           </div>
         </form>

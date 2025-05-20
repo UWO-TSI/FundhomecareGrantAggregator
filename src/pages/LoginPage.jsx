@@ -19,15 +19,32 @@ const LoginPage = () => {
     const handleSignIn = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setError(""); // Clear previous errors
 
         try {
-            const result = await signInUser(email, password)
+            const result = await signInUser(email, password);
 
             if (result.success){
-                navigate("/dashboard")
+                const userRole = result.role;
+                const isAttemptingAdminLogin = isAdmin; // Role being attempted via UI
+
+                if (isAttemptingAdminLogin && userRole === 'admin') {
+                    navigate("/dashboard");
+                } else if (!isAttemptingAdminLogin && userRole === 'user') {
+                    navigate("/dashboard");
+                } else {
+                    // Role mismatch
+                    const expectedPortal = userRole === 'admin' ? 'Admin' : 'User';
+                    setError(`Incorrect login portal. Your role is "${userRole}". Please use the ${expectedPortal} Login.`);
+                    // Optionally, sign them out if you logged them in before checking role in AuthContext
+                    // This is handled in AuthContext now by signing out if role fetch fails or role not found.
+                }
+            } else {
+                setError(result.error || "Login failed. Please check your credentials.");
             }
         } catch (err) {
-            setError("an error occurred")
+            console.error("Login page error: ", err); // Log the actual error for debugging
+            setError("An unexpected error occurred. Please try again.");
         } finally {
             setLoading(false);
         }
