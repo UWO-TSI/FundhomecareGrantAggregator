@@ -317,7 +317,7 @@ const GrantDetailsModal = ({ grant, onClose, scrollToNotes = false }) => {
     
                 {/* Notes Section - with ref for scrolling */}
                 <div id="notes-section" ref={notesRef}>
-                    <h3 style={styles.heading}>Capture Notes</h3>
+                    <h3 style={styles.heading}>Description</h3>
                     <textarea 
                         placeholder="Enter follow-up notes here..." 
                         value={notes} 
