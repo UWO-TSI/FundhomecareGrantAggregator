@@ -346,14 +346,19 @@ const sampleGrants = [
       }
     
       if (type === "excel") {
-        const worksheetData = filteredGrants.map((g) => ({
-          Name: g.name,
-          Type: g.type,
-          Amount: g.amount,
-          Date: g.date,
-          Assignee: g.assignee,
-          Status: g.status,
-        }));
+        const worksheetData = filteredGrants.map((g) => {
+          const details = g.original?.grant_id ? grantDetails[g.original.grant_id] : {};
+          return {
+              Name: g.name,
+              Type: g.type,
+              Amount: g.amount,
+              Date: g.date,
+              Assignee: g.assignee,
+              Status: g.status,
+              Description: details?.description || details?.notes || "N/A",
+            };
+    });
+
     
         const worksheet = XLSX.utils.json_to_sheet(worksheetData);
         const workbook = XLSX.utils.book_new();
