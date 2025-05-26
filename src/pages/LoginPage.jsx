@@ -29,7 +29,7 @@ const LoginPage = () => {
                 const isAttemptingAdminLogin = isAdmin; // Role being attempted via UI
 
                 if (isAttemptingAdminLogin && userRole === 'admin') {
-                    navigate("/dashboard");
+                    navigate("/admin-dashboard");
                 } else if (!isAttemptingAdminLogin && userRole === 'user') {
                     navigate("/dashboard");
                 } else {
