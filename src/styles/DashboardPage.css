@@ -211,32 +211,53 @@
   }
   
   /* ============ Export Buttons ============ */
-  .export-buttons {
-    display: flex;
-    gap: 10px;
-    margin: 15px 0;
-  }
+  .export-button-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin: 20px 0;
+  align-items: center;
+  width: 100%;
+}
+
+.export-button,
+.print-pdf-button,
+.add-grant-button {
+  background-color: #7B2CBF;
+  color: white !important;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin: 0;
+  display: inline-block;
+}
   
-  .export-button,
-  .print-pdf-button,
-  .add-grant-button {
-    background-color: #7B2CBF;
-    color: white !important;
-    border: none;
-    border-radius: 6px;
-    padding: 12px 20px;
-    margin-right: 8px;
-    margin-bottom: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
+  /* Specific styling for different button types */
+.add-grant-button {
+  order: 1; /* Put Add New Grant first */
+}
+
+.print-pdf-button {
+  order: 2; /* Put Print/PDF second */
+  background-color: #8a2be2;
+}
+
+.export-button {
+  order: 3; /* Put Export third */
+  background-color: #8a2be2;
+}
+
+.export-button.pdf {
+  background-color: #8a2be2;
+}
   
-  .export-button.pdf {
-    background-color: #8a2be2;
-  }
-  
-  .export-button.excel {
+.export-button.excel {
     background-color: #8a2be2;
   }
   
@@ -282,4 +303,3 @@
     width: 60px;
     text-align: center;
   }
-  
