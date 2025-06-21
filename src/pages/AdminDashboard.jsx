@@ -4,6 +4,53 @@ import "../styles/DashboardPage.css";
 import GrantDetailsModal from './GrantDetailsModal';
 import AddGrantModal from './AddGrantModal'; // ✅ new import
 import GrantStatusChart from '../components/GrantStatusChart';
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
+const handleExport = (type, grants) => {
+  if (type === "pdf") {
+    const doc = new jsPDF();
+
+    const totalAmount = grants.reduce((sum, g) => sum + Number(g.amount || 0), 0);
+    doc.setFontSize(22);
+    doc.setTextColor(123, 44, 191);
+    doc.text("Grant Status Overview", 60, 20);
+
+    const now = new Date().toLocaleString();
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated: ${now}`, 14, 30);
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text(`Total Grant Amount: $${totalAmount.toLocaleString()}`, 14, 40);
+
+    autoTable(doc, {
+      startY: 50,
+      head: [["Grant Name", "Amount", "Status"]],
+      body: grants.map((g) => [g.name, `$${g.amount.toLocaleString()}`, g.status]),
+      headStyles: { fillColor: [123, 44, 191], textColor: "#fff", fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [245, 240, 255] },
+    });
+
+    doc.save("admin-dashboard-report.pdf");
+  }
+
+  if (type === "excel") {
+    const worksheet = XLSX.utils.json_to_sheet(
+      grants.map((g) => ({
+        Name: g.name,
+        Amount: g.amount,
+        Status: g.status,
+      }))
+    );
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Grants");
+    const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    saveAs(new Blob([buffer], { type: "application/octet-stream" }), "admin-grants.xlsx");
+  }
+};
 
 const AdminDashboard = () => {
     const [grants, setGrants] = useState([
@@ -42,10 +89,17 @@ const AdminDashboard = () => {
 
                 <GrantStatusChart grants={grants} />
 
-                {/* ✅ Add New Grant Button */}
-                <button className="add-grant-button" onClick={() => setIsAddModalOpen(true)}>
+                <div className="export-button-row">
+                    <button className="add-grant-button" onClick={() => setIsAddModalOpen(true)}>
                     ➕ Add New Grant
                 </button>
+                    <button onClick={() => handleExport("pdf", grants)} className="action-button print-pdf-button">
+                        <i className="fas fa-file-pdf"></i> Print / PDF
+                    </button>
+                    <button onClick={() => handleExport("excel", grants)} className="action-button export-button">
+                        <i className="fas fa-file-export"></i> Export
+                    </button>
+                </div>
 
                 <table className="grants-table">
                     <thead>
