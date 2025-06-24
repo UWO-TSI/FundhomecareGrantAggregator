@@ -69,9 +69,23 @@ const AdminDashboard = () => {
         alert(`Edit grant with ID: ${id}`);
     };
 
-    const handleDelete = (id) => {
-        setGrants(grants.filter(grant => grant.id !== id));
+    const handleDelete = async (id) => {
+
+        console.log("Attempting to delete grant with ID:", id, "Type:", typeof id);
+        const { error } = await supabase
+            .from('Grant') // ✅ match the actual table name
+            .delete()
+            .eq('grant_id', id);
+
+        if (error) {
+            console.error("Error deleting grant:", error.message);
+            alert("Failed to delete grant from database.");
+        } else {
+            console.log("Grant deleted successfully from Supabase"); // ✅
+            setGrants(prev => prev.filter(grant => grant.grant_id !== id));
+        }
     };
+
 
     const [showModal, setShowModal] = useState(false);
     const [selectedGrant, setSelectedGrant] = useState(null);
@@ -131,6 +145,7 @@ const AdminDashboard = () => {
                     </thead>
                     <tbody>
                         {grants.map((grant) => (
+                            <tr key={grant.grant_id}>
                             <tr key={grant.id}>
                                 <td>{grant.title}</td>
                                 <td>${Number(grant.amount).toLocaleString()}</td>
@@ -147,7 +162,7 @@ const AdminDashboard = () => {
                                     </button>
                                     <button
                                         className="delete-button"
-                                        onClick={() => handleDelete(grant.id)}
+                                        onClick={() => handleDelete(grant.grant_id)}
                                     >
                                         🗑️ Delete
                                     </button>
