@@ -1,55 +1,85 @@
-import React, { useState } from 'react';
-import Sidebar from '../components/Sidebar'; // ✅ Import the Sidebar
+import React, { useState, useEffect } from 'react';
+import Sidebar from '../components/Sidebar';
 import '../styles/SettingsStyles.css';
-
-const initialUsers = [
-  { id: 1, name: 'Rohit', role: 'Assignee' },
-  { id: 2, name: 'Denise', role: 'Viewer' },
-  { id: 3, name: 'Alex', role: 'Admin' },
-];
+import supabase from '../supabase-client';
 
 const SettingsPage = () => {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleRoleChange = (id, newRole) => {
-    const updatedUsers = users.map(user =>
-      user.id === id ? { ...user, role: newRole } : user
-    );
-    setUsers(updatedUsers);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const { data, error } = await supabase
+        .from('User')
+        .select('user_id, email, role');
+
+        console.log('Fetched users:', data);
+
+      if (error) {
+        console.error('Error fetching users:', error);
+      } else {
+        console.log('Fetched users:', data);
+        setUsers(data);
+      }
+      setLoading(false);
+    };
+
+    fetchUsers();
+  }, []);
+
+  const handleRoleChange = async (user_id, newRole) => {
+    const { error } = await supabase
+      .from('User')
+      .update({ role: newRole })
+      .eq('user_id', user_id);
+
+    if (error) {
+      console.error('Error updating role:', error);
+    } else {
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.user_id === user_id ? { ...user, role: newRole } : user
+        )
+      );
+    }
   };
 
   return (
-    <div className="dashboard-container"> {/* ✅ reuse layout container */}
-      <Sidebar /> {/* ✅ Add the sidebar */}
-      <div className="dashboard-content">  {/* ✅ mimic layout for consistency */}
+    <div className="dashboard-container">
+      <Sidebar />
+      <div className="dashboard-content">
         <h2>Settings: Manage Assignee Roles</h2>
-        <table className="settings-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Current Role</th>
-              <th>Assign New Role</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(user => (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-                <td>{user.role}</td>
-                <td>
-                  <select
-                    value={user.role}
-                    onChange={e => handleRoleChange(user.id, e.target.value)}
-                  >
-                    <option value="Admin">Admin</option>
-                    <option value="Assignee">Assignee</option>
-                    <option value="Viewer">Viewer</option>
-                  </select>
-                </td>
+
+        {loading ? (
+          <p>Loading users...</p>
+        ) : (
+          <table className="settings-table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Current Role</th>
+                <th>Assign New Role</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map(user => (
+                <tr key={user.user_id}>
+                  <td>{user.email}</td>
+                  <td>{user.role}</td>
+                  <td>
+                    <select
+                      value={user.role}
+                      onChange={e => handleRoleChange(user.user_id, e.target.value)}
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="user">User</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
