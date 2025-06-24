@@ -222,7 +222,8 @@
 }
 
 .export-button,
-.print-pdf-button {
+.print-pdf-button,
+.add-grant-button {
   background-color: #7B2CBF;
   color: white !important;
   border: none;
