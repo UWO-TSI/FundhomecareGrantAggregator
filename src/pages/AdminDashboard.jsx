@@ -146,6 +146,7 @@ const AdminDashboard = () => {
                     <tbody>
                         {grants.map((grant) => (
                             <tr key={grant.grant_id}>
+                            <tr key={grant.id}>
                                 <td>{grant.title}</td>
                                 <td>${Number(grant.amount).toLocaleString()}</td>
                                 <td>{grant.is_active ? "In Process" : "Closed"}</td>
