@@ -8,6 +8,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import supabase from "../supabase-client";
 
 const handleExport = (type, grants) => {
   if (type === "pdf") {
@@ -62,8 +63,18 @@ const AdminDashboard = () => {
         alert(`Edit grant with ID: ${id}`);
     };
 
-    const handleDelete = (id) => {
-        setGrants(grants.filter(grant => grant.id !== id));
+    const handleDelete = async (id) => {
+        const { error } = await supabase
+            .from('grants')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            console.error("Error deleting grant:", error);
+            return;
+        } else {
+            setGrants(grants.filter(grant => grant.id !== id));   
+        }
     };
 
     const [showModal, setShowModal] = useState(false);
