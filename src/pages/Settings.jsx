@@ -28,21 +28,25 @@ const SettingsPage = () => {
   }, []);
 
   const handleRoleChange = async (user_id, newRole) => {
-    const { error } = await supabase
-      .from('User')
-      .update({ role: newRole })
-      .eq('user_id', user_id);
+  console.log(`Updating user ${user_id} to role: ${newRole}`);
 
-    if (error) {
-      console.error('Error updating role:', error);
-    } else {
-      setUsers(prevUsers =>
-        prevUsers.map(user =>
-          user.user_id === user_id ? { ...user, role: newRole } : user
-        )
-      );
-    }
-  };
+  const { error, data } = await supabase
+    .from('User')
+    .update({ role: newRole })
+    .eq('user_id', user_id)
+
+  if (error) {
+    console.error('❌ Error updating role:', error);
+  } else {
+    console.log('✅ Role updated successfully:', data);
+    setUsers(prevUsers =>
+      prevUsers.map(user =>
+        user.user_id === user_id ? { ...user, role: newRole } : user
+      )
+    );
+  }
+};
+
 
   return (
     <div className="dashboard-container">
@@ -69,11 +73,21 @@ const SettingsPage = () => {
                   <td>
                     <select
                       value={user.role}
-                      onChange={e => handleRoleChange(user.user_id, e.target.value)}
-                    >
-                      <option value="admin">Admin</option>
-                      <option value="user">User</option>
-                    </select>
+                      onChange={(e) => {
+                        const newRole = e.target.value;
+
+                        setUsers(prevUsers =>
+                          prevUsers.map(u =>
+                            u.user_id === user.user_id ? { ...u, role: newRole } : u
+                          )
+                        );
+
+                        handleRoleChange(user.user_id, newRole);
+                      }}
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                      </select>
                   </td>
                 </tr>
               ))}
