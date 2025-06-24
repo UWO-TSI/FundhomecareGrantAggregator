@@ -8,6 +8,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { useEffect } from "react";
 import supabase from "../supabase-client";
 
 const handleExport = (type, grants) => {
@@ -54,42 +55,58 @@ const handleExport = (type, grants) => {
 };
 
 const AdminDashboard = () => {
-    const [grants, setGrants] = useState([
-        { id: 1, name: "Cancer Research Fund", amount: 50000, status: "Applied" },
-        { id: 2, name: "Palliative Care Grant", amount: 75000, status: "Granted" }
-    ]);
+    const [grants, setGrants] = useState([]);
+    useEffect(() => {
+        const fetchGrants = async () => {
+            const { data, error } = await supabase.from('Grant').select('*');
+            if (error) console.error("Error fetching grants:", error);
+            else setGrants(data);
+  };
+  fetchGrants();
+}, []);
 
     const handleEdit = (id) => {
         alert(`Edit grant with ID: ${id}`);
     };
 
     const handleDelete = async (id) => {
+
+        console.log("Attempting to delete grant with ID:", id, "Type:", typeof id);
         const { error } = await supabase
-            .from('grants')
+            .from('Grant') // ✅ match the actual table name
             .delete()
-            .eq('id', id);
+            .eq('grant_id', id);
 
         if (error) {
-            console.error("Error deleting grant:", error);
-            return;
+            console.error("Error deleting grant:", error.message);
+            alert("Failed to delete grant from database.");
         } else {
-            setGrants(grants.filter(grant => grant.id !== id));   
+            console.log("Grant deleted successfully from Supabase"); // ✅
+            setGrants(prev => prev.filter(grant => grant.grant_id !== id));
         }
     };
+
 
     const [showModal, setShowModal] = useState(false);
     const [selectedGrant, setSelectedGrant] = useState(null);
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false); // ✅ new modal state
 
-    const handleAddGrant = (newGrant) => {
-        const newGrantWithId = {
-            ...newGrant,
-            id: grants.length + 1,
-            amount: parseFloat(newGrant.amount)
-        };
-        setGrants(prev => [...prev, newGrantWithId]);
-    };
+    const handleAddGrant = async (newGrant) => {
+        const { data, error } = await supabase.from('Grant').insert([{
+            title: newGrant.name,
+            amount: parseFloat(newGrant.amount),
+            funding_agency: newGrant.type,
+            assignee: newGrant.assignee,
+            is_active: true, // or based on status
+            deadline: newGrant.date,
+        }]);
+  if (error) console.error("Error adding grant:", error);
+  else {
+    setGrants(prev => [...prev, ...data]);
+  }
+};
+
 
     return (
         <div className="dashboard-container">
@@ -98,7 +115,12 @@ const AdminDashboard = () => {
                 <h2>Admin Dashboard</h2>
                 <p>Admins can add, edit, and manage grants here.</p>
 
-                <GrantStatusChart grants={grants} />
+                <GrantStatusChart 
+                grants={grants.map(g => ({
+                    ...g,
+                    status: g.is_active ? "In Process" : "Closed",
+                }))}
+                />
 
                 <div className="export-button-row">
                     <button className="add-grant-button" onClick={() => setIsAddModalOpen(true)}>
@@ -123,10 +145,10 @@ const AdminDashboard = () => {
                     </thead>
                     <tbody>
                         {grants.map((grant) => (
-                            <tr key={grant.id}>
-                                <td>{grant.name}</td>
-                                <td>${grant.amount.toLocaleString()}</td>
-                                <td>{grant.status}</td>
+                            <tr key={grant.grant_id}>
+                                <td>{grant.title}</td>
+                                <td>${Number(grant.amount).toLocaleString()}</td>
+                                <td>{grant.is_active ? "In Process" : "Closed"}</td>
                                 <td>
                                     <button
                                         className="edit-button"
@@ -139,7 +161,7 @@ const AdminDashboard = () => {
                                     </button>
                                     <button
                                         className="delete-button"
-                                        onClick={() => handleDelete(grant.id)}
+                                        onClick={() => handleDelete(grant.grant_id)}
                                     >
                                         🗑️ Delete
                                     </button>
