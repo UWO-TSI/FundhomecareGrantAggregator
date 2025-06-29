@@ -1,5 +1,3 @@
-A comprehensive grant discovery and management platform that automates data collection from multiple funding sources and provides an intuitive web interface for grant tracking and administration.
-
 ## ✨ Key Features
 
 ### Automated Data Collection
