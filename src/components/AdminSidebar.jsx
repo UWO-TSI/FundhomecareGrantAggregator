@@ -4,7 +4,7 @@ import '../styles/DashboardPage.css';
 import logo from '../assets/fundhomecarelogo.png';
 import { UserAuth } from "../context/AuthContext";
 
-const Sidebar = () => {
+const AdminSidebar = () => {
     const navigate = useNavigate();
     const { userRole } = UserAuth();
 
@@ -18,7 +18,10 @@ const Sidebar = () => {
             <img src={logo} alt="Fund Homecare Logo" className="sidebar-logo" />
             <ul className="sidebar-menu">
                 <li>
-                    <Link to="/dashboard">📄 Grants</Link>
+                    <Link to="/admin-dashboard">📄 Grants</Link>
+                </li>
+                <li>
+                    <Link to="/settings">⚙️ Settings</Link>
                 </li>
             </ul>
             <button onClick={handleLogout} className="logout-button">Logout</button>
@@ -26,4 +29,4 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;
+export default AdminSidebar;
