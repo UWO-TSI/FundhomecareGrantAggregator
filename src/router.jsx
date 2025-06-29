@@ -15,7 +15,6 @@ export const router = createBrowserRouter([
     { path: "/signin", element: <LoginPage />},
     { path: "/forgot-password", element: <ForgotPasswordPage />},
     { path: "/update-password", element: <UpdatePasswordPage />},
-    { path: "/settings", element: <SettingsPage />},
     { 
         path: "/dashboard", 
         element: (
@@ -31,5 +30,13 @@ export const router = createBrowserRouter([
                 <AdminDashboard /> 
             </PrivateRoute>
         ),   
-    }, 
+    },
+    { 
+        path: "/settings",
+        element: (
+            <PrivateRoute>
+                <SettingsPage />
+            </PrivateRoute>
+        ),
+    }
 ]) 
