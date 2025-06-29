@@ -13,8 +13,8 @@
 - **Export functionality** supporting PDF and Excel formats with charts 
 
 ### Administrative Tools
-- **Grant CRUD operations** for administrators [10](#0-9) 
-- **User role management** interface [11](#0-10) 
+- **Grant CRUD operations** for administrators
+- **User role management** interface
 
 
 ## 🚀 Getting Started
