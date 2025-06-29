@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import AdminSidebar from "../components/AdminSidebar";
 import "../styles/DashboardPage.css";
 import GrantDetailsModal from './GrantDetailsModal';
 import AddGrantModal from './AddGrantModal'; // ✅ new import
@@ -110,7 +110,7 @@ const AdminDashboard = () => {
 
     return (
         <div className="dashboard-container">
-            <Sidebar />
+            <AdminSidebar />
             <div className="dashboard-content">
                 <h2>Admin Dashboard</h2>
                 <p>Admins can add, edit, and manage grants here.</p>

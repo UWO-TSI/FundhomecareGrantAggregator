@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
+import AdminSidebar from '../components/AdminSidebar';
 import '../styles/SettingsStyles.css';
 import supabase from '../supabase-client';
 
@@ -50,7 +50,7 @@ const SettingsPage = () => {
 
   return (
     <div className="dashboard-container">
-      <Sidebar />
+      <AdminSidebar />
       <div className="dashboard-content">
         <h2>Settings: Manage Assignee Roles</h2>
 
