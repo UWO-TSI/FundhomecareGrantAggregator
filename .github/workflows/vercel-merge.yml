@@ -24,7 +24,12 @@ jobs:
           envVariableKeys: SUPABASE_URL,SUPABASE_API_KEY
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          TARGET_SUPABASE_URL: preview,development,production
+          TYPE_SUPABASE_URL: encrypted
+
           SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
+          TARGET_SUPABASE_API_KEY: preview,development,production
+          TYPE_SUPABASE_API_KEY: encrypted
 
       - name: Deploy to Vercel (production)
         uses: amondnet/vercel-action@v20
