@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set Vercel environment variables
-        uses: dkershner6/vercel-set-env-action
+        uses: dkershner6/vercel-set-env-action@v3
         with:
           token: ${{ secrets.VERCEL_TOKEN }}
           projectName: fundhomecarescraper
