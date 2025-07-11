@@ -201,9 +201,8 @@ const GrantDetailsModal = ({ grant, onClose, scrollToNotes = false }) => {
 
     const styles = {
         heading: {
-            color: "#333", 
+            color: "white", 
             backgroundColor: "#7B2CBF",
-            color: "white",
             padding: "8px 12px",
             borderRadius: "4px",
             display: "inline-block",
