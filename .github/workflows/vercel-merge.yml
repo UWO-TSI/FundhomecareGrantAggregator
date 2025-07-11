@@ -5,29 +5,30 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  pull-requests: write
+  repository-projects: write
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      # Optional: set environment variables on Vercel
-      - uses: dkershner6/vercel-set-env-action@v1
+      - name: Set Vercel environment variables
+        uses: dkershner6/vercel-set-env-action@v1
         with:
           token: ${{ secrets.VERCEL_TOKEN }}
           projectName: fundhomecarescraper
           envVariableKeys: SUPABASE_URL,SUPABASE_API_KEY
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          TARGET_SUPABASE_URL: preview,development,production
-          TYPE_SUPABASE_URL: encrypted
-
           SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
-          TARGET_SUPABASE_API_KEY: preview,development,production
-          TYPE_SUPABASE_API_KEY: encrypted
 
-      - uses: amondnet/vercel-action@v20
+      - name: Deploy to Vercel (production)
+        uses: amondnet/vercel-action@v20
+        id: vercel-deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
