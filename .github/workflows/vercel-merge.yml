@@ -21,15 +21,15 @@ jobs:
         with:
           token: ${{ secrets.VERCEL_TOKEN }}
           projectName: fundhomecarescraper
-          envVariableKeys: SUPABASE_URL,SUPABASE_API_KEY
+          envVariableKeys: VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          TARGET_SUPABASE_URL: preview,development,production
-          TYPE_SUPABASE_URL: encrypted
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          TARGET_VITE_SUPABASE_URL: preview,development,production
+          TYPE_VITE_SUPABASE_URL: encrypted
 
-          SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
-          TARGET_SUPABASE_API_KEY: preview,development,production
-          TYPE_SUPABASE_API_KEY: encrypted
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_API_KEY }}
+          TARGET_VITE_SUPABASE_ANON_KEY: preview,development,production
+          TYPE_VITE_SUPABASE_ANON_KEY: encrypted
 
       - name: Deploy to Vercel (production)
         uses: amondnet/vercel-action@v20
