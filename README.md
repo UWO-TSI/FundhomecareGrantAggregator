@@ -42,6 +42,8 @@ pip install -r requirements.txt
 # Start development server
 npm run dev
 ```
+### Supabase setup
+<img width="1084" height="1024" alt="image" src="https://github.com/user-attachments/assets/c7953143-78c5-4e7c-b355-52e09a39ee2c" />
 
 ## 🤖 Automated Scraping
 
