@@ -3,7 +3,7 @@ name: Grant Scraper Scheduled Run
 on:
   schedule:
     - cron: '0 0 * * 0'  # Runs every Sunday at midnight UTC
-  workflow_dispatch:  
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -13,13 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install python3-distutils (for Python 3.11+)
-        run: sudo apt-get update && sudo apt-get install -y python3-distutils
-
-      - name: Set up Python
+      - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.9'
 
       - name: Upgrade pip, setuptools, wheel
         run: python -m pip install --upgrade pip setuptools wheel
