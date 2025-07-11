@@ -17,13 +17,13 @@ jobs:
         with:
           token: ${{ secrets.VERCEL_TOKEN }}
           projectName: fundhomecarescraper
-          envVariableKeys: SUPABASE_URL,SUPABASE_KEY
+          envVariableKeys: SUPABASE_URL,SUPABASE_API_KEY
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           TARGET_SUPABASE_URL: preview,development,production
           TYPE_SUPABASE_URL: encrypted
 
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_API_KEY }}
           TARGET_SUPABASE_KEY: preview,development,production
           TYPE_SUPABASE_KEY: encrypted
 
