@@ -16,20 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set Vercel environment variables
-        uses: dkershner6/vercel-set-env-action@v3
-        with:
-          token: ${{ secrets.VERCEL_TOKEN }}
-          projectName: fundhomecarescraper
-          envVariableKeys: VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY
+      - name: Show env vars for debugging
+        run: |
+          echo "VITE_SUPABASE_URL=$VITE_SUPABASE_URL"
+          echo "VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY:0:4}****"
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          TARGET_VITE_SUPABASE_URL: preview,development,production
-          TYPE_VITE_SUPABASE_URL: encrypted
-
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_API_KEY }}
-          TARGET_VITE_SUPABASE_ANON_KEY: preview,development,production
-          TYPE_VITE_SUPABASE_ANON_KEY: encrypted
 
       - name: Deploy to Vercel (production)
         uses: amondnet/vercel-action@v20
@@ -40,3 +33,6 @@ jobs:
           vercel-args: '--prod'
           vercel-org-id: ${{ secrets.ORG_ID }}
           vercel-project-id: ${{ secrets.PROJECT_ID }}
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_API_KEY }}
