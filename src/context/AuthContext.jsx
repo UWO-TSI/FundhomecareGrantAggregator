@@ -21,8 +21,8 @@ export const AuthContextProvider = ({ children }) => {
                 .single();
 
             if (userError) {
-                console.error("Error fetching user role for session: ", userError);
-                setUserRole(null); // Or handle error as appropriate
+                console.error("Error fetching user role for session: ", userError.message);
+                setUserRole(null);
                 return;
             }
             if (userData) {
@@ -32,7 +32,7 @@ export const AuthContextProvider = ({ children }) => {
                 setUserRole(null);
             }
         } catch (e) {
-            console.error("Exception fetching user role for session: ", e);
+            console.error("Exception fetching user role for session: ", e.message);
             setUserRole(null);
         }
     };
@@ -47,7 +47,7 @@ export const AuthContextProvider = ({ children }) => {
         });
 
         if(error){
-            console.error("There was a problem creating your account", error);
+            console.error("There was a problem creating your account", error.message);
             return { success: false, error };
         }
             return { success: true, data };
@@ -55,7 +55,7 @@ export const AuthContextProvider = ({ children }) => {
 
     // Sign in
     const signInUser = async ( email, password ) => {
-        console.log("[AuthContext] signInUser: Attempting sign-in for", email);
+        console.log("[AuthContext] signInUser: Attempting sign-in");
         try {
             console.log("[AuthContext] signInUser: Calling supabase.auth.signInWithPassword");
             const {data: authData, error: authError} = await supabase.auth.signInWithPassword({
@@ -65,26 +65,26 @@ export const AuthContextProvider = ({ children }) => {
             console.log("[AuthContext] signInUser: supabase.auth.signInWithPassword completed");
 
             if (authError){
-                console.error("[AuthContext] signInUser: signInWithPassword error: ", authError);
+                console.error("[AuthContext] signInUser: signInWithPassword error: ", authError.message);
                 setUserRole(null); 
                 return {success: false, error: authError.message}
             }
-            console.log("[AuthContext] signInUser: signInWithPassword success. User data: ", authData.user);
+            console.log("[AuthContext] signInUser: signInWithPassword success");
 
             if (authData && authData.user) {
-                console.log("[AuthContext] signInUser: Attempting to fetch role for user ID:", authData.user.id);
+                console.log("[AuthContext] signInUser: Attempting to fetch role for user");
                 const { data: userData, error: userError } = await supabase
                     .from('User')
                     .select('role')
                     .eq('user_id', authData.user.id)
                     .single();
-                console.log("[AuthContext] signInUser: Fetch role completed.");
+                console.log("[AuthContext] signInUser: Fetch role completed");
 
                 if (userError) {
-                    console.error("[AuthContext] signInUser: Error fetching user role. Supabase error details: ", userError);
-                    console.log("[AuthContext] signInUser: Attempting signOut due to role fetch error.");
+                    console.error("[AuthContext] signInUser: Error fetching user role: ", userError.message);
+                    console.log("[AuthContext] signInUser: Attempting signOut due to role fetch error");
                     await supabase.auth.signOut(); 
-                    console.log("[AuthContext] signInUser: signOut completed after role fetch error.");
+                    console.log("[AuthContext] signInUser: signOut completed after role fetch error");
                     setUserRole(null); 
                     return { success: false, error: "Failed to retrieve user role. Check console for details." };
                 }
@@ -94,19 +94,19 @@ export const AuthContextProvider = ({ children }) => {
                     setUserRole(userData.role); 
                     return { success: true, data: authData, role: userData.role };
                 } else {
-                    console.error("[AuthContext] signInUser: User role not found in User table.");
-                    console.log("[AuthContext] signInUser: Attempting signOut due to role not found.");
+                    console.error("[AuthContext] signInUser: User role not found in User table");
+                    console.log("[AuthContext] signInUser: Attempting signOut due to role not found");
                     await supabase.auth.signOut();
-                    console.log("[AuthContext] signInUser: signOut completed after role not found.");
+                    console.log("[AuthContext] signInUser: signOut completed after role not found");
                     setUserRole(null); 
                     return { success: false, error: "User role not found." };
                 }
             }
-            console.warn("[AuthContext] signInUser: authData or authData.user is null after successful signInWithPassword.");
+            console.warn("[AuthContext] signInUser: authData or authData.user is null after successful signInWithPassword");
             setUserRole(null); 
             return { success: false, error: "User authentication failed (no user object)." };
         } catch(error) {
-            console.error("[AuthContext] signInUser: Unhandled exception in signInUser: ", error);
+            console.error("[AuthContext] signInUser: Unhandled exception in signInUser: ", error.message);
             setUserRole(null); 
             return { success: false, error: "An unexpected error occurred during sign in." };
         }
@@ -138,7 +138,7 @@ export const AuthContextProvider = ({ children }) => {
     const signOut = async () => {
         const {error} = await supabase.auth.signOut();
         if (error) {
-            console.error("there was an error ", error);
+            console.error("Sign out error: ", error.message);
         }
         setUserRole(null);
     }
@@ -153,13 +153,13 @@ export const AuthContextProvider = ({ children }) => {
             });
 
             if (error){
-                console.error("forgot password error ocurred: ", error);
+                console.error("Forgot password error: ", error.message);
                 return {success: false, error: error.message}
             }
-            console.log("forgot password success: ", data);
+            console.log("Forgot password request sent successfully");
             return { success: true };
         } catch(error) {
-            console.error("an error occurred: ", error)
+            console.error("Forgot password error: ", error.message)
         }
 
     }
@@ -173,16 +173,15 @@ export const AuthContextProvider = ({ children }) => {
             });
 
             if (error) {
-                console.error("Error verifying OTP: ", error);
+                console.error("Error verifying OTP: ", error.message);
                 return {success: false, error: error.message}
             }
-            console.log("OTP success: ", data);
+            console.log("OTP verification successful");
             return { success: true };
         } catch(error) {
-            console.error("An error occurred: ", error)
+            console.error("OTP verification error: ", error.message)
         }
     }
-
 
     // Update password
     const updatePassword = async ( newPassword, token, userEmail ) =>{
@@ -192,13 +191,13 @@ export const AuthContextProvider = ({ children }) => {
             });
 
             if (error) {
-                console.error("Error updating password: ", error);
+                console.error("Error updating password: ", error.message);
                 return {success: false, error: error.message}
             }
-            console.log("Update password success: ", data);
+            console.log("Password updated successfully");
             return { success: true };
         } catch(error) {
-            console.error("An error occurred: ", error)
+            console.error("Password update error: ", error.message)
         }
     }
 
