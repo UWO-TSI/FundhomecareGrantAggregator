@@ -14,7 +14,6 @@ function UpdatePasswordPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [token, setToken] = useState(null);
-    console.log(session);
 
     useEffect(() => {
         const resetToken = searchParams.get('token');

@@ -13,8 +13,7 @@ function CreateAccountPage() {
 
     const { session, signUpNewUser} = UserAuth();
     const navigate = useNavigate();
-    console.log(session);
-    console.log(email,password);
+    
 
     const handleSignUp = async (e) => {
         console.log("eneted signup")
