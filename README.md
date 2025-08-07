@@ -20,7 +20,7 @@
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm
+- Node.js 20+ and npm
 - Python 3.9+
 - Supabase account and project
 
